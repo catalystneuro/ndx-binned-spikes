@@ -7,7 +7,7 @@ groups:
   attributes:
   - name: bin_width_in_milliseconds
     dtype: float64
-    doc: The lenght in milliseconds of the bins
+    doc: The length in milliseconds of the bins
   - name: milliseconds_from_event_to_first_bin
     dtype: float64
     default_value: 0.0
