@@ -3,10 +3,6 @@ import os.path
 
 from pynwb.spec import NWBNamespaceBuilder, export_spec, NWBGroupSpec, NWBAttributeSpec, NWBRefSpec, NWBDatasetSpec
 
-# TODO: import other spec classes as needed
-# from pynwb.spec import NWBDatasetSpec, NWBLinkSpec, NWBDtypeSpec, NWBRefSpec
-
-
 def main():
     # these arguments were auto-generated from your cookiecutter inputs
     ns_builder = NWBNamespaceBuilder(
@@ -43,7 +39,7 @@ def main():
     
     event_timestamps = NWBDatasetSpec(
         name="event_timestamps",
-        doc="The timestamps at whic the event occurred.",
+        doc="The timestamps at which the event occurred.",
         dtype="float64",
         shape=(None,),
         dims=("number_of_event_repetitions",),
@@ -58,7 +54,7 @@ def main():
         attributes=[
             NWBAttributeSpec(
                 name="bin_width_in_milliseconds",
-                doc="The lenght in milliseconds of the bins",
+                doc="The length in milliseconds of the bins",
                 dtype="float64",
             ),
             NWBAttributeSpec(
@@ -72,7 +68,7 @@ def main():
             ),
             NWBAttributeSpec(
                 name="units",
-                doc="A link to the units Table that contains the units of the data.",
+                doc="A link to the Units table that contains the units of the data.",
                 required=False,
                 dtype=NWBRefSpec(target_type="Units", reftype="object"),
             ),
