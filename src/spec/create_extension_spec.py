@@ -3,10 +3,6 @@ import os.path
 
 from pynwb.spec import NWBNamespaceBuilder, export_spec, NWBGroupSpec, NWBAttributeSpec, NWBRefSpec, NWBDatasetSpec
 
-# TODO: import other spec classes as needed
-# from pynwb.spec import NWBDatasetSpec, NWBLinkSpec, NWBDtypeSpec, NWBRefSpec
-
-
 def main():
     # these arguments were auto-generated from your cookiecutter inputs
     ns_builder = NWBNamespaceBuilder(
@@ -72,7 +68,7 @@ def main():
             ),
             NWBAttributeSpec(
                 name="units",
-                doc="A link to the units Table that contains the units of the data.",
+                doc="A link to the Units table that contains the units of the data.",
                 required=False,
                 dtype=NWBRefSpec(target_type="Units", reftype="object"),
             ),
