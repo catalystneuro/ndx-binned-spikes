@@ -3,6 +3,7 @@ import os.path
 
 from pynwb.spec import NWBNamespaceBuilder, export_spec, NWBGroupSpec, NWBAttributeSpec, NWBRefSpec, NWBDatasetSpec
 
+
 def main():
     # these arguments were auto-generated from your cookiecutter inputs
     ns_builder = NWBNamespaceBuilder(
@@ -24,11 +25,6 @@ def main():
     # of the other extension below
     # ns_builder.include_namespace("ndx-other-extension")
 
-    # TODO: define your new data types
-    # see https://pynwb.readthedocs.io/en/stable/tutorials/general/extensions.html
-    # for more information
-
-
     binned_aligned_spikes_data = NWBDatasetSpec(
         name="data",
         doc="TODO",
@@ -36,7 +32,7 @@ def main():
         shape=[(None, None, None)],
         dims=[("num_units", "number_of_event_repetitions", "number_of_bins")],
     )
-    
+
     event_timestamps = NWBDatasetSpec(
         name="event_timestamps",
         doc="The timestamps at which the event occurred.",
@@ -68,9 +64,9 @@ def main():
             ),
             NWBAttributeSpec(
                 name="units",
-                doc="A link to the Units table that contains the units of the data.",
+                doc="A reference to the Units table region that contains the units of the data.",
                 required=False,
-                dtype=NWBRefSpec(target_type="Units", reftype="object"),
+                dtype=NWBRefSpec(target_type="DynamicTableRegion", reftype="region"),
             ),
         ],
     )
