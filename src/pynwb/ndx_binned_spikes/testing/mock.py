@@ -3,6 +3,7 @@ from typing import Optional
 from ndx_binned_spikes import BinnedAlignedSpikes
 import numpy as np
 
+
 def mock_BinnedAlignedSpikes(
     number_of_units: int = 2,
     number_of_event_repetitions: int = 4,
@@ -12,7 +13,7 @@ def mock_BinnedAlignedSpikes(
     seed: int = 0,
     event_timestamps: Optional[np.ndarray] = None,
     data: Optional[np.ndarray] = None,
-) -> 'BinnedAlignedSpikes':
+) -> "BinnedAlignedSpikes":
     """
     Generate a mock BinnedAlignedSpikes object with specified parameters or from given data.
 
@@ -65,13 +66,13 @@ def mock_BinnedAlignedSpikes(
     else:
         rng = np.random.default_rng(seed=seed)
         data = rng.integers(low=0, high=100, size=(number_of_units, number_of_event_repetitions, number_of_bins))
-    
+
     if event_timestamps is None:
         event_timestamps = np.arange(number_of_event_repetitions, dtype="float64")
     else:
-        assert event_timestamps.shape[0] == number_of_event_repetitions, (
-            "The shape of `event_timestamps` does not match `number_of_event_repetitions`."
-        )
+        assert (
+            event_timestamps.shape[0] == number_of_event_repetitions
+        ), "The shape of `event_timestamps` does not match `number_of_event_repetitions`."
         event_timestamps = np.array(event_timestamps, dtype="float64")
 
     if event_timestamps.shape[0] != data.shape[1]:

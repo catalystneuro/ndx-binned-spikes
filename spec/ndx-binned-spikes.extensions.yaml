@@ -17,9 +17,9 @@ groups:
     required: false
   - name: units
     dtype:
-      target_type: Units
-      reftype: object
-    doc: A link to the units Table that contains the units of the data.
+      target_type: DynamicTableRegion
+      reftype: region
+    doc: A reference to the Units table region that contains the units of the data.
     required: false
   datasets:
   - name: data
