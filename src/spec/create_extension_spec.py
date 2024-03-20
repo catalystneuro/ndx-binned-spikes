@@ -37,13 +37,13 @@ def main():
         name="data",
         doc="TODO",
         dtype="numeric",  # TODO should this be a uint64?
-        shape=[(None, None), (None, None, None)],
-        dims=[("number_of_event_repetitions", "number_of_bins"), ("number_of_event_repetitions", "number_of_bins", "num_units")],
+        shape=[(None, None, None)],
+        dims=[("num_units", "number_of_event_repetitions", "number_of_bins")],
     )
     
     event_timestamps = NWBDatasetSpec(
         name="event_timestamps",
-        doc="The timestamps at whic the event occurred.",
+        doc="The timestamps at which the event occurred.",
         dtype="float64",
         shape=(None,),
         dims=("number_of_event_repetitions",),
@@ -58,7 +58,7 @@ def main():
         attributes=[
             NWBAttributeSpec(
                 name="bin_width_in_milliseconds",
-                doc="The lenght in milliseconds of the bins",
+                doc="The length in milliseconds of the bins",
                 dtype="float64",
             ),
             NWBAttributeSpec(

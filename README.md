@@ -1,6 +1,6 @@
 # ndx-binned-spikes Extension for NWB
 
-to-do
+⚠️ **Warning: This extension is currently in alpha and subject to change before the first release.**
 
 ## Installation
 

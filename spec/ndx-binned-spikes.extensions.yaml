@@ -7,7 +7,7 @@ groups:
   attributes:
   - name: bin_width_in_milliseconds
     dtype: float64
-    doc: The lenght in milliseconds of the bins
+    doc: The length in milliseconds of the bins
   - name: milliseconds_from_event_to_first_bin
     dtype: float64
     default_value: 0.0
@@ -25,14 +25,10 @@ groups:
   - name: data
     dtype: numeric
     dims:
-    - - number_of_event_repetitions
+    - - num_units
+      - number_of_event_repetitions
       - number_of_bins
-    - - number_of_event_repetitions
-      - number_of_bins
-      - num_units
     shape:
-    - - null
-      - null
     - - null
       - null
       - null
@@ -43,4 +39,4 @@ groups:
     - number_of_event_repetitions
     shape:
     - null
-    doc: The timestamps at whic the event occurred.
+    doc: The timestamps at which the event occurred.

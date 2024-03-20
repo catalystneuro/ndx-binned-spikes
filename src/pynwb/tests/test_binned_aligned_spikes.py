@@ -5,13 +5,12 @@ TODO: Modify these tests to test your extension neurodata type.
 
 import numpy as np
 
-from pynwb import NWBHDF5IO, NWBFile
-from pynwb.testing.mock.device import mock_Device
-from pynwb.testing.mock.ecephys import mock_ElectrodeGroup, mock_ElectrodeTable
+from pynwb import NWBHDF5IO
 from pynwb.testing.mock.file import mock_NWBFile
-from pynwb.testing import TestCase, remove_test_file, NWBH5IOFlexMixin
+from pynwb.testing import TestCase, remove_test_file
 
 from ndx_binned_spikes import BinnedAlignedSpikes
+from ndx_binned_spikes.testing.mock import mock_BinnedAlignedSpikes
 
 
 class TestBinnedAlignedSpikesConstructor(TestCase):
@@ -24,16 +23,16 @@ class TestBinnedAlignedSpikesConstructor(TestCase):
     def test_constructor(self):
         """Test that the constructor for BinnedAlignedSpikes sets values as expected."""
 
+        number_of_units = 2
         number_of_bins = 3
         number_of_event_repetitions = 4
         bin_width_in_milliseconds = 20.0
         milliseconds_from_event_to_first_bin = 1.0
-        data_list = []
-        for i in range(number_of_event_repetitions):
-            data_list.append([i] * number_of_bins)
-        data = np.array(data_list)
-        event_timestamps = np.arange(number_of_event_repetitions, dtype="float64")
-
+        
+        rng = np.random.default_rng(seed=0)
+        data = rng.integers(low=0, high=100, size=(number_of_units, number_of_event_repetitions, number_of_bins))
+        event_timestamps = np.arange(number_of_event_repetitions, dtype="float64") 
+        
         binned_aligned_spikes = BinnedAlignedSpikes(
             bin_width_in_milliseconds=bin_width_in_milliseconds,
             milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
@@ -47,31 +46,12 @@ class TestBinnedAlignedSpikesConstructor(TestCase):
         self.assertEqual(
             binned_aligned_spikes.milliseconds_from_event_to_first_bin, milliseconds_from_event_to_first_bin
         )
+        
+        self.assertEqual(binned_aligned_spikes.data.shape[0], number_of_units)
+        self.assertEqual(binned_aligned_spikes.data.shape[1], number_of_event_repetitions)
+        self.assertEqual(binned_aligned_spikes.data.shape[2], number_of_bins)
 
-        self.assertEqual(binned_aligned_spikes.data.shape[0], number_of_event_repetitions)
-        self.assertEqual(binned_aligned_spikes.data.shape[1], number_of_bins)
 
-
-def generate_binned_aligned_spikes(
-    number_of_bins=3,
-    number_of_event_repetitions=4,
-    bin_width_in_milliseconds=20.0,
-    milliseconds_from_event_to_first_bin=1.0,
-):
-
-    data_list = []
-    for i in range(number_of_event_repetitions):
-        data_list.append([i] * number_of_bins)
-    data = np.array(data_list)
-    event_timestamps = np.arange(number_of_event_repetitions, dtype="float64")
-
-    binned_aligned_spikes = BinnedAlignedSpikes(
-        bin_width_in_milliseconds=bin_width_in_milliseconds,
-        milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
-        data=data,
-        event_timestamps=event_timestamps,
-    )
-    return binned_aligned_spikes
 
 
 class TestBinnedAlignedSpikesSimpleRoundtrip(TestCase):
@@ -82,7 +62,7 @@ class TestBinnedAlignedSpikesSimpleRoundtrip(TestCase):
     def setUp(self):
         self.nwbfile = mock_NWBFile()
 
-        self.binned_aligned_spikes = generate_binned_aligned_spikes()
+        self.binned_aligned_spikes = mock_BinnedAlignedSpikes()
 
         self.path = "test.nwb"
 
@@ -91,8 +71,8 @@ class TestBinnedAlignedSpikesSimpleRoundtrip(TestCase):
 
     def test_roundtrip_acquisition(self):
         """
-        Add a BinnedAlignedSpikes to an NWBFile, write it to file, read the file, and test that the BinnedAlignedSpikes from the
-        file matches the original BinnedAlignedSpikes.
+        Add a BinnedAlignedSpikes to an NWBFile, write it to file, read the file
+        and test that the BinnedAlignedSpikes from the file matches the original BinnedAlignedSpikes.
         """
 
         self.nwbfile.add_acquisition(self.binned_aligned_spikes)
