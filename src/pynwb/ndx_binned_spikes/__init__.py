@@ -63,7 +63,7 @@ class BinnedAlignedSpikes(NWBDataInterface):
         {
             "name": "data",
             "type": "array_data",
-            "shape": [(None, None, None), (None, None)],
+            "shape": [(None, None, None)],
             "doc": "The source of the data",
         },
         {
@@ -84,7 +84,7 @@ class BinnedAlignedSpikes(NWBDataInterface):
         keys_to_set = ("bin_width_in_milliseconds", "milliseconds_from_event_to_first_bin", "units")
         args_to_set = popargs_to_dict(keys_to_set, kwargs)
 
-        keys_to_process = ("data", "event_timestamps")  # these are properties and cannot be set with setattr
+        keys_to_process = ("data", "event_timestamps")
         args_to_process = popargs_to_dict(keys_to_process, kwargs)
         super().__init__(**kwargs)
 
@@ -94,9 +94,6 @@ class BinnedAlignedSpikes(NWBDataInterface):
 
         # Post-process / post_init
         data = args_to_process["data"]
-
-        data = data if data.ndim == 3 else data[np.newaxis, ...]
-
         event_timestamps = args_to_process["event_timestamps"]
 
         if data.shape[1] != event_timestamps.shape[0]:
