@@ -1,7 +1,9 @@
 name: Run code coverage
 on:
-  push:
   pull_request:
+    types: [synchronize, opened, reopened]
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
