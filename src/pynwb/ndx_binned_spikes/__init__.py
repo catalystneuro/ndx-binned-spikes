@@ -2,8 +2,9 @@ import os
 import numpy as np
 
 from pynwb import load_namespaces, get_class
+from pynwb import register_class
 from pynwb.core import NWBDataInterface
-from hdmf.utils import docval, popargs_to_dict, get_docval, popargs
+from hdmf.utils import docval, popargs_to_dict
 
 try:
     from importlib.resources import files
@@ -24,10 +25,8 @@ load_namespaces(str(__spec_path))
 
 # BinnedAlignedSpikes = get_class("BinnedAlignedSpikes", "ndx-binned-spikes")
 
-from pynwb import register_class, docval
 
-
-@register_class(neurodata_type="BinnedAlignedSpikes", namespace="ndx-binned-spikes")
+@register_class(neurodata_type="BinnedAlignedSpikes", namespace="ndx-binned-spikes") #noqa
 class BinnedAlignedSpikes(NWBDataInterface):
     __nwbfields__ = (
         "name",
