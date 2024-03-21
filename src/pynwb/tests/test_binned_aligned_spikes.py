@@ -24,9 +24,9 @@ class TestBinnedAlignedSpikesConstructor(TestCase):
         self.number_of_event_repetitions = 4
         self.bin_width_in_milliseconds = 20.0
         self.milliseconds_from_event_to_first_bin = -100.0
-        rng = np.random.default_rng(seed=0)
+        self.rng = np.random.default_rng(seed=0)
 
-        self.data = rng.integers(
+        self.data = self.rng.integers(
             low=0,
             high=100,
             size=(
@@ -98,6 +98,25 @@ class TestBinnedAlignedSpikesConstructor(TestCase):
 
         expected_names = [unit_name_a, unit_name_c]
         self.assertListEqual(unit_table_names, expected_names)
+
+    def test_accepting_input_with_no_number_of_units_dimension(self):
+
+        data = self.rng.integers(
+            low=0,
+            high=100,
+            size=(
+                self.number_of_event_repetitions,
+                self.number_of_bins,
+            ),
+        )
+        binned_aligned_spikes = BinnedAlignedSpikes(
+            bin_width_in_milliseconds=self.bin_width_in_milliseconds,
+            milliseconds_from_event_to_first_bin=self.milliseconds_from_event_to_first_bin,
+            data=data,
+            event_timestamps=self.event_timestamps,
+        )
+
+        self.assertEqual(binned_aligned_spikes.data.shape, (1, self.number_of_event_repetitions, self.number_of_bins))
 
 
 class TestBinnedAlignedSpikesSimpleRoundtrip(TestCase):
