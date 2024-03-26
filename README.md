@@ -2,14 +2,86 @@
 
 ⚠️ **Warning: This extension is currently in alpha and subject to change before the first release.**
 
-## Installation
 
+## Installation
+Python:
+```bash
+pip install -U ndx-events
+```
 
 ## Usage
 
+### Simple example
+The following code illustrates the use of this extension:
+
 ```python
+import numpy as np
+from ndx_binned_spikes import BinnedAlignedSpikes
+
+
+data = np.array(
+    [
+        [  # Data of the first unit
+            [5, 1, 3, 2],  # First timestamp bins
+            [6, 3, 4, 3],  # Second timestamp bins
+            [4, 2, 1, 4],  # Third timestamp bins
+        ],
+        [ # Data of the second unit
+            [8, 4, 0, 2],  # First timestamp bins
+            [3, 3, 4, 2],  # Second timestamp bins
+            [2, 7, 4, 1],  # Third timestamp bins
+        ],
+    ],
+)
+
+event_timestamps = np.array([0.25, 5.0, 12.25])  # The timestamps to which we align the counts
+milliseconds_from_event_to_first_bin = -50.0  # The first bin is 50 ms before the event
+bin_width_in_milliseconds = 100.0  # Each bin is 100 ms wide
+binned_aligned_spikes = BinnedAlignedSpikes(
+    data=data,
+    event_timestamps=event_timestamps,
+    bin_width_in_milliseconds=bin_width_in_milliseconds,
+    milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin
+)
 
 ```
+
+The resulting object is usually added to a processing module:
+
+```python
+from pynwb.testing.mock.file import mock_NWBFile
+from pynwb import NWBHDF5IO
+
+
+nwbfile = mock_NWBFile()
+
+ecephys_processinng_module = nwbfile.create_processing_module(
+    name="ecephys", description="a description"
+)
+ecephys_processinng_module.add(binned_aligned_spikes)
+```
+
+### Parameters and data structure
+
+In the `BinnedAlignedSpikes` class, we count events around a set of timestamps that we call event timestamps. That is, we aligned the counts to a set of event timestamps. 
+
+<img src="./assets/parameters.svg" alt="Parameter meaning" style="width: 75%; height: auto;">
+
+We illustrate this more specifically in the diagram above. For every event timestamp we built a set of bins using the following parameters:
+
+* `milliseconds_from_event_to_first_bin`: The time in milliseconds from the event to the first bin. If the value is negative, the first bin is before the event. If the value is positive, the first bin is after the event.
+* `bin_width_in_milliseconds`: The width of each bin in milliseconds.
+
+
+
+The `data` argument passed to the `BinnedAlignSpikes` stores counts across all the event timestamps for each of the units. The data is a 3D array where the first dimension is the unit, the second dimension corresponds to specific timestamps, and the third dimension is the bin count. That is shape of the data has to be  `(number_of_units`, `number_of_event_repetitions`, `number_of_bins`). Note that the `event_timestamps` argument should have the same length as the second dimension of the data. 
+
+
+<img src="./assets/data.svg" alt="Data meaning" style="width: 75%; height: auto;">
+
+
+
+
 
 ---
 This extension was created using [ndx-template](https://github.com/nwb-extensions/ndx-template).
