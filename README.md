@@ -56,7 +56,7 @@ from pynwb import NWBHDF5IO
 nwbfile = mock_NWBFile()
 
 ecephys_processinng_module = nwbfile.create_processing_module(
-    name="ecephys", description="a description"
+    name="ecephys", description="Intermediate data from extracellular electrophysiology recordings, e.g., LFP."
 )
 ecephys_processinng_module.add(binned_aligned_spikes)
 ```
@@ -76,7 +76,7 @@ The structure of the bins are characterized with the following parameters:
 
 
 
-The `data` argument passed to the `BinnedAlignSpikes` stores counts across all the event timestamps for each of the units. The data is a 3D array where the first dimension are the units, the second dimension corresponds to the event_timestamps, and the third dimension is the bin count. That is, the shape of the data is  `(number_of_units`, `number_of_event_repetitions`, `number_of_bins`). Some comments about this convention:
+The `data` argument passed to the `BinnedAlignedSpikes` stores counts across all the event timestamps for each of the units. The data is a 3D array where the first dimension are the units, the second dimension corresponds to the event_timestamps, and the third dimension is the bin count. That is, the shape of the data is  `(number_of_units`, `number_of_event_repetitions`, `number_of_bins`). Some comments about this convention:
 
 * The `event_timestamps` argument should have the same length as the second dimension of `data`.
 * The first dimension works almost like a dictionary. That is, you select a specific unit by indexing the first dimension. For example, `data[0]` would return the data of the first unit. For each of the units, the data is organized with the time on the first axis as it is the convention in the NWB format. Moreover, this means that data of each unit is contiguous in memory.
