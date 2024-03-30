@@ -25,9 +25,9 @@
      inkscape:document-units="mm"
      showgrid="false"
      showguides="false"
-     inkscape:zoom="8.0000001"
-     inkscape:cx="31.3125"
-     inkscape:cy="77.499999"
+     inkscape:zoom="5.6568543"
+     inkscape:cx="103.32598"
+     inkscape:cy="63.816386"
      inkscape:window-width="1685"
      inkscape:window-height="1371"
      inkscape:window-x="4315"
@@ -621,29 +621,34 @@
     <text
        xml:space="preserve"
        style="font-size:1.05833px;font-family:sans-serif;-inkscape-font-specification:sans-serif;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.1;stroke-linejoin:bevel;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.443841"
-       x="58.362766"
-       y="45.149296"
+       x="58.083172"
+       y="45.828835"
        id="text41121-4"><tspan
          sodipodi:role="line"
          style="stroke-width:0.1"
-         x="58.362766"
-         y="45.149296"
+         x="58.083172"
+         y="45.828835"
          id="tspan41133-3">data.shape ==  (2, 3, 4)</tspan><tspan
          sodipodi:role="line"
          style="stroke-width:0.1"
-         x="58.362766"
-         y="46.47221"
-         id="tspan41959">number_of_units : 2</tspan><tspan
+         x="58.083172"
+         y="47.151749"
+         id="tspan41959"></tspan><tspan
          sodipodi:role="line"
          style="stroke-width:0.1"
-         x="58.362766"
-         y="47.79512"
-         id="tspan41961">number_of_event_repetitions : 3</tspan><tspan
+         x="58.083172"
+         y="48.474659"
+         id="tspan588">number of units : 2</tspan><tspan
          sodipodi:role="line"
          style="stroke-width:0.1"
-         x="58.362766"
-         y="49.118034"
-         id="tspan41963">number_of_bins: 4</tspan></text>
+         x="58.083172"
+         y="49.797573"
+         id="tspan41961">number of events : 3</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.1"
+         x="58.083172"
+         y="51.120483"
+         id="tspan41963">number of bins: 4</tspan></text>
     <rect
        style="fill:#a2cddb;fill-opacity:1;stroke:none;stroke-width:0.1;stroke-linejoin:bevel;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.443841"
        id="rect47409"
@@ -686,5 +691,22 @@
        height="1"
        x="46.884285"
        y="51.1353" />
+    <text
+       xml:space="preserve"
+       style="font-size:1.05833px;font-family:sans-serif;-inkscape-font-specification:sans-serif;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.1;stroke-linejoin:bevel;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.443841"
+       x="58.362766"
+       y="43.884743"
+       id="text41121-3"><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.1"
+         x="58.362766"
+         y="43.884743"
+         id="tspan41133-2">event_timestamps = array([t<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan582">1</tspan>, t<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan584">2</tspan>, t<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan586">3</tspan>])</tspan></text>
   </g>
 </svg>
