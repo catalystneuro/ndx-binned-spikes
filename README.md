@@ -11,6 +11,8 @@ pip install -U ndx-binned-spikes
 
 ## Usage
 
+The `BinnedAlignedSpikes` object is designed to store counts of spikes around a set of events (e.g. stimuli or behavioral events such as licks). The events are characterized by their timestamps and a bin data structure is used to store the spike events around each of the event timestamps. The `BinnedAlignedSpikes` keeps a separate count for each of the units (e.g. neurons). 
+
 ### Simple example
 The following code illustrates the use of this extension:
 
@@ -56,30 +58,32 @@ from pynwb import NWBHDF5IO
 nwbfile = mock_NWBFile()
 
 ecephys_processinng_module = nwbfile.create_processing_module(
-    name="ecephys", description="a description"
+    name="ecephys", description="Intermediate data from extracellular electrophysiology recordings, e.g., LFP."
 )
 ecephys_processinng_module.add(binned_aligned_spikes)
 ```
 
 ### Parameters and data structure
+The structure of the bins are characterized with the following parameters:
+ 
+* `milliseconds_from_event_to_first_bin`: The time in milliseconds from the event to the first bin. A negative values indicates that the first bin is before the event whereas a positive value indicates that the first bin is after the event. 
+* `bin_width_in_milliseconds`: The width of each bin in milliseconds.
 
-In the `BinnedAlignedSpikes` class, we count events (usually spikes) around a set of timestamps that we call `event_timestamps`. That is, we align the counts to a set of event timestamps.  The process is illustrated in the diagram below.
 
 <div style="text-align: center;">
     <img src="./assets/parameters.svg" alt="Parameter meaning" style="width: 75%; height: auto;">
 </div>
 
-The structure of the bins are characterized with the following parameters:
-
-* `milliseconds_from_event_to_first_bin`: The time in milliseconds from the event to the first bin. A negative values indicates that the first bin is before the event whereas a positive value indicates that the first bin is after the event. In the diagram above, the `milliseconds_from_event_to_first_bin` is negative.
-* `bin_width_in_milliseconds`: The width of each bin in milliseconds.
+Note that in the diagram above, the `milliseconds_from_event_to_first_bin` is negative.
 
 
 
-The `data` argument passed to the `BinnedAlignSpikes` stores counts across all the event timestamps for each of the units. The data is a 3D array where the first dimension are the units, the second dimension corresponds to the event_timestamps, and the third dimension is the bin count. That is, the shape of the data is  `(number_of_units`, `number_of_event_repetitions`, `number_of_bins`). Some comments about this convention:
+The `data` argument passed to the `BinnedAlignedSpikes` stores counts across all the event timestamps for each of the units. The data is a 3D array where the first dimension indexes the units, the second dimension indexes the event timestamps, and the third dimension indexes the bins where the counts are stored. The shape of the data is  `(number_of_units`, `number_of_event_repetitions`, `number_of_bins`). 
 
-* The `event_timestamps` argument should have the same length as the second dimension of `data`.
-* The first dimension works almost like a dictionary. That is, you select a specific unit by indexing the first dimension. For example, `data[0]` would return the data of the first unit. For each of the units, the data is organized with the time on the first axis as it is the convention in the NWB format. Moreover, this means that data of each unit is contiguous in memory.
+
+The `event_timestamps` is used to store the timestamps of the events and should have the same length as the second dimension of `data`.
+
+The first dimension of `data` works almost like a dictionary. That is, you select a specific unit by indexing the first dimension. For example, `data[0]` would return the data of the first unit. For each of the units, the data is organized with the time on the first axis as this is the convention in the NWB format. As a consequence of this choice the data of each unit is contiguous in memory.
 
 The following diagram illustrates the structure of the data for a concrete example:
 <div style="text-align: center;">
