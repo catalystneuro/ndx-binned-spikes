@@ -11,7 +11,7 @@ pip install -U ndx-binned-spikes
 
 ## Usage
 
-The `BinnedAlignedSpikes` object is designed to store counts of spikes around a set of events (e.g. stimuli or behavioral events such as licks). The events are characterized by their timestamps and a bin data structure is used to store the spike counts around each of the event timestamps. The `BinnedAlignedSpikes` object keeps a separate count for each of the units (e.g. neurons), in other words, the the spikes of the units are counted separately but aligned to the same set of events.
+The `BinnedAlignedSpikes` object is designed to store counts of spikes around a set of events (e.g., stimuli or behavioral events such as licks). The events are characterized by their timestamps and a bin data structure is used to store the spike counts around each of the event timestamps. The `BinnedAlignedSpikes` object keeps a separate count for each of the units (e.g., neurons), in other words, the spikes of the units are counted separately but aligned to the same set of events.
 
 ### Simple example
 The following code illustrates the use of this extension:
