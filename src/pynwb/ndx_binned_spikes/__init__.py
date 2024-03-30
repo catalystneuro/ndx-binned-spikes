@@ -1,5 +1,4 @@
 import os
-import numpy as np
 
 from pynwb import load_namespaces, get_class
 from pynwb import register_class
