@@ -6,7 +6,7 @@
 ## Installation
 Python:
 ```bash
-pip install -U ndx-events
+pip install -U ndx-binned-spikes
 ```
 
 ## Usage
@@ -63,22 +63,28 @@ ecephys_processinng_module.add(binned_aligned_spikes)
 
 ### Parameters and data structure
 
-In the `BinnedAlignedSpikes` class, we count events around a set of timestamps that we call event timestamps. That is, we aligned the counts to a set of event timestamps. 
+In the `BinnedAlignedSpikes` class, we count events (usually spikes) around a set of timestamps that we call `event_timestamps`. That is, we align the counts to a set of event timestamps.  The process is illustrated in the diagram below.
 
-<img src="./assets/parameters.svg" alt="Parameter meaning" style="width: 75%; height: auto;">
+<div style="text-align: center;">
+    <img src="./assets/parameters.svg" alt="Parameter meaning" style="width: 75%; height: auto;">
+</div>
 
-We illustrate this more specifically in the diagram above. For every event timestamp we built a set of bins using the following parameters:
+The structure of the bins are characterized with the following parameters:
 
-* `milliseconds_from_event_to_first_bin`: The time in milliseconds from the event to the first bin. If the value is negative, the first bin is before the event. If the value is positive, the first bin is after the event.
+* `milliseconds_from_event_to_first_bin`: The time in milliseconds from the event to the first bin. A negative values indicates that the first bin is before the event whereas a positive value indicates that the first bin is after the event. In the diagram above, the `milliseconds_from_event_to_first_bin` is negative.
 * `bin_width_in_milliseconds`: The width of each bin in milliseconds.
 
 
 
-The `data` argument passed to the `BinnedAlignSpikes` stores counts across all the event timestamps for each of the units. The data is a 3D array where the first dimension is the unit, the second dimension corresponds to specific timestamps, and the third dimension is the bin count. That is shape of the data has to be  `(number_of_units`, `number_of_event_repetitions`, `number_of_bins`). Note that the `event_timestamps` argument should have the same length as the second dimension of the data. 
+The `data` argument passed to the `BinnedAlignSpikes` stores counts across all the event timestamps for each of the units. The data is a 3D array where the first dimension are the units, the second dimension corresponds to the event_timestamps, and the third dimension is the bin count. That is, the shape of the data is  `(number_of_units`, `number_of_event_repetitions`, `number_of_bins`). Some comments about this convention:
 
+* The `event_timestamps` argument should have the same length as the second dimension of `data`.
+* The first dimension works almost like a dictionary. That is, you select a specific unit by indexing the first dimension. For example, `data[0]` would return the data of the first unit. For each of the units, the data is organized with the time on the first axis as it is the convention in the NWB format. Moreover, this means that data of each unit is contiguous in memory.
 
+The following diagram illustrates the structure of the data for a concrete example:
+<div style="text-align: center;">
 <img src="./assets/data.svg" alt="Data meaning" style="width: 75%; height: auto;">
-
+</div>
 
 
 
