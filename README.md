@@ -66,7 +66,7 @@ ecephys_processinng_module.add(binned_aligned_spikes)
 ### Parameters and data structure
 The structure of the bins are characterized with the following parameters:
  
-* `milliseconds_from_event_to_first_bin`: The time in milliseconds from the event to the first bin. A negative values indicates that the first bin is before the event whereas a positive value indicates that the first bin is after the event. 
+* `milliseconds_from_event_to_first_bin`: The time in milliseconds from the event to the first bin. A negative value indicates that the first bin is before the event whereas a positive value indicates that the first bin is after the event. 
 * `bin_width_in_milliseconds`: The width of each bin in milliseconds.
 
 
