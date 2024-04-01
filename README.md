@@ -57,10 +57,10 @@ from pynwb import NWBHDF5IO
 
 nwbfile = mock_NWBFile()
 
-ecephys_processinng_module = nwbfile.create_processing_module(
+ecephys_processing_module = nwbfile.create_processing_module(
     name="ecephys", description="Intermediate data from extracellular electrophysiology recordings, e.g., LFP."
 )
-ecephys_processinng_module.add(binned_aligned_spikes)
+ecephys_processing_module.add(binned_aligned_spikes)
 ```
 
 ### Parameters and data structure
