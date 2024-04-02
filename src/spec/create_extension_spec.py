@@ -32,24 +32,35 @@ def main():
             "is the number of events, and the third dimension is the number of bins."
             ),
         dtype="numeric",  # TODO should this be a uint64?
-        shape=[(None, None, None)],
-        dims=[("num_units", "number_of_events", "number_of_bins")],
+        shape=[None, None, None],
+        dims=["num_units", "number_of_events", "number_of_bins"],
     )
 
     event_timestamps = NWBDatasetSpec(
         name="event_timestamps",
         doc="The timestamps at which the events occurred.",
         dtype="float64",
-        shape=(None,),
-        dims=("number_of_events",),
+        shape=[None],
+        dims=["number_of_events"],
     )
-
+    
+    units_region = NWBDatasetSpec(
+        name="units",
+        neurodata_type_inc="DynamicTableRegion",
+        doc="A reference to the Units table region that contains the units of the data.",
+        dtype=NWBRefSpec(target_type="Units", reftype="region"),
+        shape=[None],
+        dims=["number_of_units"],
+        quantity="?",
+        
+    )
+    
     binned_aligned_spikes = NWBGroupSpec(
         neurodata_type_def="BinnedAlignedSpikes",
         neurodata_type_inc="NWBDataInterface",
         default_name="BinnedAlignedSpikes",
         doc="A data interface for binned spike data aligned to an event (e.g. a stimuli or the beginning of a trial).",
-        datasets=[binned_aligned_spikes_data, event_timestamps],
+        datasets=[binned_aligned_spikes_data, event_timestamps, units_region],
         attributes=[
             NWBAttributeSpec(
                 name="name",
@@ -74,16 +85,10 @@ def main():
                 "The time in milliseconds from the event to the beginning of the first bin. A negative value indicates"
                 "that the first bin is before the event whereas a positive value indicates that the first bin is "
                 "after the event." 
-            ),
+                ),
                 dtype="float64",
                 default_value=0.0,
-            ),
-            NWBAttributeSpec(
-                name="units",
-                doc="A reference to the Units table region that contains the units of the data.",
-                required=False,
-                dtype=NWBRefSpec(target_type="DynamicTableRegion", reftype="region"),
-            ),
+            )
         ],
     )
 

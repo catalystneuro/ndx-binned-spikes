@@ -4,6 +4,7 @@ from pynwb import load_namespaces, get_class
 from pynwb import register_class
 from pynwb.core import NWBDataInterface
 from hdmf.utils import docval
+from hdmf.common import DynamicTableRegion
 
 try:
     from importlib.resources import files
@@ -85,7 +86,7 @@ class BinnedAlignedSpikes(NWBDataInterface):
         },
         {
             "name": "units",
-            "type": "DynamicTableRegion",
+            "type": DynamicTableRegion,
             "doc": "A reference to the Units table region that contains the units of the data.",
             "default": None,
         },

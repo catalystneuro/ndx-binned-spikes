@@ -91,6 +91,80 @@ The following diagram illustrates the structure of the data for a concrete examp
 </div>
 
 
+### Linking to units table
+One way to make the information stored in the `BinnedAlignedSpikes` object more useful is to indicate exactly which units or neurons the first dimension of the `data` attribute corresponds to. This is **optional but recommended** as it makes the data more interpretable and useful for future users. In NWB the units are usually stored in a `Units` [table](https://pynwb.readthedocs.io/en/stable/pynwb.misc.html#pynwb.misc.Units). To illustrate how to to reate this link let's ffirst create a toy `Units` table:
+
+```python
+import numpy as np
+from pynwb.misc import Units 
+from hdmf.common import DynamicTableRegion
+from pynwb.testing.mock.file import mock_NWBFile
+
+num_units = 5
+max_spikes_per_unit = 10
+
+units_table = Units(name="units")
+
+rng = np.random.default_rng(seed=0)
+
+times = rng.random(size=(num_units, max_spikes_per_unit)).cumsum(axis=1)
+spikes_per_unit = rng.integers(1, max_spikes_per_unit, size=num_units)
+
+spike_times = []
+for unit_index in range(num_units):
+
+    # Not all units have the same number of spikes
+    spike_times = times[unit_index, : spikes_per_unit[unit_index]]
+    units_table.add_unit(spike_times=spike_times, unit_name=unit_name)
+
+
+# We then create a mock NWB file and add the units table
+nwbfile = mock_NWBFile()
+nwbfile.units = units_table
+```
+
+This will create a `Units` table with 5 units. We can then link the `BinnedAlignedSpikes` object to this table by creating a `DynamicTableRegion` object. This allows to be very specific about which units the data in the `BinnedAlignedSpikes` object corresponds to. The following code illustrates how to create the `DynamicTableRegion` object and link it to the `BinnedAlignedSpikes` object:
+```python
+
+region_indices = [0, 1, 2]
+units_region = DynamicTableRegion(
+    data=region_indices, table=units_table, description="region of units table", name="units_region"
+)
+
+
+# Now we create the BinnedAlignedSpikes object and link it to the units table
+data = np.array(
+    [
+        [  # Data of the first unit
+            [5, 1, 3, 2],  # First timestamp bins
+            [6, 3, 4, 3],  # Second timestamp bins
+            [4, 2, 1, 4],  # Third timestamp bins
+        ],
+        [ # Data of the second unit
+            [8, 4, 0, 2],  # First timestamp bins
+            [3, 3, 4, 2],  # Second timestamp bins
+            [2, 7, 4, 1],  # Third timestamp bins
+        ],
+    ],
+)
+
+event_timestamps = np.array([0.25, 5.0, 12.25])
+milliseconds_from_event_to_first_bin = -50.0  # The first bin is 50 ms before the event
+bin_width_in_milliseconds = 100.0
+name = "BinnedAignedSpikesForMyPurpose"
+description = "Spike counts that is binned and aligned to events."
+binned_aligned_spikes = BinnedAlignedSpikes(
+    data=data,
+    event_timestamps=event_timestamps,
+    bin_width_in_milliseconds=bin_width_in_milliseconds,
+    milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
+    description=description,
+    name=name,
+    units=units_region,
+)
+
+
+```
 
 
 ---

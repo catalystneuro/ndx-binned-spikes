@@ -23,23 +23,17 @@ groups:
       A negative value indicatesthat the first bin is before the event whereas a positive
       value indicates that the first bin is after the event.
     required: false
-  - name: units
-    dtype:
-      target_type: DynamicTableRegion
-      reftype: region
-    doc: A reference to the Units table region that contains the units of the data.
-    required: false
   datasets:
   - name: data
     dtype: numeric
     dims:
-    - - num_units
-      - number_of_events
-      - number_of_bins
+    - num_units
+    - number_of_events
+    - number_of_bins
     shape:
-    - - null
-      - null
-      - null
+    - null
+    - null
+    - null
     doc: The binned data. It should be an array whose first dimension is the number
       of units, the second dimension is the number of events, and the third dimension
       is the number of bins.
@@ -50,3 +44,11 @@ groups:
     shape:
     - null
     doc: The timestamps at which the events occurred.
+  - name: units
+    neurodata_type_inc: DynamicTableRegion
+    dims:
+    - number_of_units
+    shape:
+    - null
+    doc: A reference to the Units table region that contains the units of the data.
+    quantity: '?'
