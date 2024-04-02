@@ -3,7 +3,7 @@ import os
 from pynwb import load_namespaces, get_class
 from pynwb import register_class
 from pynwb.core import NWBDataInterface
-from hdmf.utils import docval, popargs_to_dict
+from hdmf.utils import docval
 
 try:
     from importlib.resources import files
@@ -25,10 +25,11 @@ load_namespaces(str(__spec_path))
 # BinnedAlignedSpikes = get_class("BinnedAlignedSpikes", "ndx-binned-spikes")
 
 
-@register_class(neurodata_type="BinnedAlignedSpikes", namespace="ndx-binned-spikes") #noqa
+@register_class(neurodata_type="BinnedAlignedSpikes", namespace="ndx-binned-spikes")  # noqa
 class BinnedAlignedSpikes(NWBDataInterface):
     __nwbfields__ = (
         "name",
+        "description",
         "bin_width_in_milliseconds",
         "milliseconds_from_event_to_first_bin",
         "data",
@@ -37,6 +38,7 @@ class BinnedAlignedSpikes(NWBDataInterface):
     )
 
     DEFAULT_NAME = "BinnedAlignedSpikes"
+    DEFAULT_DESCRIPTION = "Spikes data binned and aligned to event timestamps."
 
     @docval(
         {
@@ -44,6 +46,12 @@ class BinnedAlignedSpikes(NWBDataInterface):
             "type": str,
             "doc": "The name of this container",
             "default": DEFAULT_NAME,
+        },
+        {
+            "name": "description",
+            "type": str,
+            "doc": "A description of what the data represents",
+            "default": DEFAULT_DESCRIPTION,
         },
         {
             "name": "bin_width_in_milliseconds",
@@ -54,8 +62,9 @@ class BinnedAlignedSpikes(NWBDataInterface):
             "name": "milliseconds_from_event_to_first_bin",
             "type": float,
             "doc": (
-                "The time in milliseconds from the event (e.g. a stimuli or the beginning of a trial),"
-                "to the first bin. Note that this is a negative number if the first bin is before the event."
+                "The time in milliseconds from the event to the beginning of the first bin. A negative value indicates"
+                "that the first bin is before the event whereas a positive value indicates that the first bin is "
+                "after the event." 
             ),
             "default": 0.0,
         },
@@ -63,43 +72,41 @@ class BinnedAlignedSpikes(NWBDataInterface):
             "name": "data",
             "type": "array_data",
             "shape": [(None, None, None)],
-            "doc": "The source of the data",
+            "doc": (
+                "The binned data. It should be an array whose first dimension is the number of units, "
+                "the second dimension is the number of events, and the third dimension is the number of bins."
+            ),
         },
         {
             "name": "event_timestamps",
             "type": "array_data",
-            "doc": "The timestamps at which the event occurred.",
+            "doc": "The timestamps at which the events occurred.",
             "shape": (None,),
         },
         {
             "name": "units",
-            "type": ("DynamicTableRegion"),
+            "type": "DynamicTableRegion",
             "doc": "A reference to the Units table region that contains the units of the data.",
             "default": None,
         },
     )
     def __init__(self, **kwargs):
 
-        keys_to_set = ("bin_width_in_milliseconds", "milliseconds_from_event_to_first_bin", "units")
-        args_to_set = popargs_to_dict(keys_to_set, kwargs)
-
-        keys_to_process = ("data", "event_timestamps")
-        args_to_process = popargs_to_dict(keys_to_process, kwargs)
-        super().__init__(**kwargs)
-
-        # Set the values
-        for key, val in args_to_set.items():
-            setattr(self, key, val)
-
-        # Post-process / post_init
-        data = args_to_process["data"]
-        event_timestamps = args_to_process["event_timestamps"]
+        data = kwargs["data"]
+        event_timestamps = kwargs["event_timestamps"]
 
         if data.shape[1] != event_timestamps.shape[0]:
             raise ValueError("The number of event timestamps must match the number of event repetitions in the data.")
 
-        self.fields["data"] = data
-        self.fields["event_timestamps"] = event_timestamps
+        super().__init__(name=kwargs["name"])
+        
+        name = kwargs.pop("name")
+        super().__init__(name=name)
+
+        for key in kwargs:
+            setattr(self, key, kwargs[key])
+        
+
 
 
 # Remove these functions from the package
