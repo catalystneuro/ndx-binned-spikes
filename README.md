@@ -66,7 +66,7 @@ ecephys_processing_module.add(binned_aligned_spikes)
 ### Parameters and data structure
 The structure of the bins are characterized with the following parameters:
  
-* `milliseconds_from_event_to_first_bin`: The time in milliseconds from the event to the first bin. A negative value indicates that the first bin is before the event whereas a positive value indicates that the first bin is after the event. 
+* `milliseconds_from_event_to_first_bin`: The time in milliseconds from the event to the beginning of the first bin. A negative value indicates that the first bin is before the event whereas a positive value indicates that the first bin is after the event. 
 * `bin_width_in_milliseconds`: The width of each bin in milliseconds.
 
 
@@ -78,7 +78,7 @@ Note that in the diagram above, the `milliseconds_from_event_to_first_bin` is ne
 
 
 
-The `data` argument passed to the `BinnedAlignedSpikes` stores counts across all the event timestamps for each of the units. The data is a 3D array where the first dimension indexes the units, the second dimension indexes the event timestamps, and the third dimension indexes the bins where the counts are stored. The shape of the data is  `(number_of_units`, `number_of_event_repetitions`, `number_of_bins`). 
+The `data` argument passed to the `BinnedAlignedSpikes` stores counts across all the event timestamps for each of the units. The data is a 3D array where the first dimension indexes the units, the second dimension indexes the event timestamps, and the third dimension indexes the bins where the counts are stored. The shape of the data is  `(number_of_units`, `number_of_events`, `number_of_bins`). 
 
 
 The `event_timestamps` is used to store the timestamps of the events and should have the same length as the second dimension of `data`.

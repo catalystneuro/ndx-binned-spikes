@@ -6,7 +6,7 @@ import numpy as np
 
 def mock_BinnedAlignedSpikes(
     number_of_units: int = 2,
-    number_of_event_repetitions: int = 4,
+    number_of_events: int = 4,
     number_of_bins: int = 3,
     bin_width_in_milliseconds: float = 20.0,
     milliseconds_from_event_to_first_bin: float = 1.0,
@@ -21,7 +21,7 @@ def mock_BinnedAlignedSpikes(
     ----------
     number_of_units : int, optional
         The number of different units (channels, neurons, etc.) to simulate.
-    number_of_event_repetitions : int, optional
+    number_of_events : int, optional
         The number of times an event is repeated.
     number_of_bins : int, optional
         The number of bins.
@@ -33,9 +33,9 @@ def mock_BinnedAlignedSpikes(
         Seed for the random number generator to ensure reproducibility.
     event_timestamps : np.ndarray, optional
         An array of timestamps for each event. If not provided, it will be automatically generated.
-        It should have size `number_of_event_repetitions`.
+        It should have size `number_of_events`.
     data : np.ndarray, optional
-        A 3D array of shape (number_of_units, number_of_event_repetitions, number_of_bins) representing
+        A 3D array of shape (number_of_units, number_of_events, number_of_bins) representing
         the binned spike data. If provided, it overrides the generation of mock data based on other parameters.
         Its shape should match the expected number of units, event repetitions, and bins.
 
@@ -62,21 +62,21 @@ def mock_BinnedAlignedSpikes(
     """
 
     if data is not None:
-        number_of_units, number_of_event_repetitions, number_of_bins = data.shape
+        number_of_units, number_of_events, number_of_bins = data.shape
     else:
         rng = np.random.default_rng(seed=seed)
-        data = rng.integers(low=0, high=100, size=(number_of_units, number_of_event_repetitions, number_of_bins))
+        data = rng.integers(low=0, high=100, size=(number_of_units, number_of_events, number_of_bins))
 
     if event_timestamps is None:
-        event_timestamps = np.arange(number_of_event_repetitions, dtype="float64")
+        event_timestamps = np.arange(number_of_events, dtype="float64")
     else:
         assert (
-            event_timestamps.shape[0] == number_of_event_repetitions
-        ), "The shape of `event_timestamps` does not match `number_of_event_repetitions`."
+            event_timestamps.shape[0] == number_of_events
+        ), "The shape of `event_timestamps` does not match `number_of_events`."
         event_timestamps = np.array(event_timestamps, dtype="float64")
 
     if event_timestamps.shape[0] != data.shape[1]:
-        raise ValueError("The shape of `event_timestamps` does not match `number_of_event_repetitions`.")
+        raise ValueError("The shape of `event_timestamps` does not match `number_of_events`.")
 
     binned_aligned_spikes = BinnedAlignedSpikes(
         bin_width_in_milliseconds=bin_width_in_milliseconds,

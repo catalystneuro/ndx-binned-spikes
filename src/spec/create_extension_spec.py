@@ -27,18 +27,21 @@ def main():
 
     binned_aligned_spikes_data = NWBDatasetSpec(
         name="data",
-        doc="TODO",
+        doc=(
+            "The binned data. It should be an array whose first dimension is the number of units, the second dimension "
+            "is the number of events, and the third dimension is the number of bins."
+            ),
         dtype="numeric",  # TODO should this be a uint64?
         shape=[(None, None, None)],
-        dims=[("num_units", "number_of_event_repetitions", "number_of_bins")],
+        dims=[("num_units", "number_of_events", "number_of_bins")],
     )
 
     event_timestamps = NWBDatasetSpec(
         name="event_timestamps",
-        doc="The timestamps at which the event occurred.",
+        doc="The timestamps at which the events occurred.",
         dtype="float64",
         shape=(None,),
-        dims=("number_of_event_repetitions",),
+        dims=("number_of_events",),
     )
 
     binned_aligned_spikes = NWBGroupSpec(
@@ -49,6 +52,18 @@ def main():
         datasets=[binned_aligned_spikes_data, event_timestamps],
         attributes=[
             NWBAttributeSpec(
+                name="name",
+                doc="The name of this container",
+                dtype="text",
+                value="BinnedAlignedSpikes",
+            ),
+            NWBAttributeSpec(
+                name="description",
+                doc="A description of what the data represents",
+                dtype="text",
+                value="Spikes data binned and aligned to event timestamps.",
+            ),
+            NWBAttributeSpec(
                 name="bin_width_in_milliseconds",
                 doc="The length in milliseconds of the bins",
                 dtype="float64",
@@ -56,9 +71,10 @@ def main():
             NWBAttributeSpec(
                 name="milliseconds_from_event_to_first_bin",
                 doc=(
-                    "The time in milliseconds from the event (e.g. a stimuli or the beginning of a trial),"
-                    "to the first bin. Note that this is a negative number if the first bin is before the event."
-                ),
+                "The time in milliseconds from the event to the beginning of the first bin. A negative value indicates"
+                "that the first bin is before the event whereas a positive value indicates that the first bin is "
+                "after the event." 
+            ),
                 dtype="float64",
                 default_value=0.0,
             ),

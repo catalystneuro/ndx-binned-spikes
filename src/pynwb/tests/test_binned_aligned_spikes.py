@@ -21,7 +21,7 @@ class TestBinnedAlignedSpikesConstructor(TestCase):
 
         self.number_of_units = 2
         self.number_of_bins = 3
-        self.number_of_event_repetitions = 4
+        self.number_of_events = 4
         self.bin_width_in_milliseconds = 20.0
         self.milliseconds_from_event_to_first_bin = -100.0
         self.rng = np.random.default_rng(seed=0)
@@ -31,12 +31,12 @@ class TestBinnedAlignedSpikesConstructor(TestCase):
             high=100,
             size=(
                 self.number_of_units,
-                self.number_of_event_repetitions,
+                self.number_of_events,
                 self.number_of_bins,
             ),
         )
 
-        self.event_timestamps = np.arange(self.number_of_event_repetitions, dtype="float64")
+        self.event_timestamps = np.arange(self.number_of_events, dtype="float64")
 
         self.nwbfile = mock_NWBFile()
 
@@ -58,7 +58,7 @@ class TestBinnedAlignedSpikesConstructor(TestCase):
         )
 
         self.assertEqual(binned_aligned_spikes.data.shape[0], self.number_of_units)
-        self.assertEqual(binned_aligned_spikes.data.shape[1], self.number_of_event_repetitions)
+        self.assertEqual(binned_aligned_spikes.data.shape[1], self.number_of_events)
         self.assertEqual(binned_aligned_spikes.data.shape[2], self.number_of_bins)
 
     def test_constructor_units_region(self):

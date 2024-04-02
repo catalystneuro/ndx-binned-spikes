@@ -5,15 +5,23 @@ groups:
   doc: A data interface for binned spike data aligned to an event (e.g. a stimuli
     or the beginning of a trial).
   attributes:
+  - name: name
+    dtype: text
+    value: BinnedAlignedSpikes
+    doc: The name of this container
+  - name: description
+    dtype: text
+    value: Spikes data binned and aligned to event timestamps.
+    doc: A description of what the data represents
   - name: bin_width_in_milliseconds
     dtype: float64
     doc: The length in milliseconds of the bins
   - name: milliseconds_from_event_to_first_bin
     dtype: float64
     default_value: 0.0
-    doc: The time in milliseconds from the event (e.g. a stimuli or the beginning
-      of a trial),to the first bin. Note that this is a negative number if the first
-      bin is before the event.
+    doc: The time in milliseconds from the event to the beginning of the first bin.
+      A negative value indicatesthat the first bin is before the event whereas a positive
+      value indicates that the first bin is after the event.
     required: false
   - name: units
     dtype:
@@ -26,17 +34,19 @@ groups:
     dtype: numeric
     dims:
     - - num_units
-      - number_of_event_repetitions
+      - number_of_events
       - number_of_bins
     shape:
     - - null
       - null
       - null
-    doc: TODO
+    doc: The binned data. It should be an array whose first dimension is the number
+      of units, the second dimension is the number of events, and the third dimension
+      is the number of bins.
   - name: event_timestamps
     dtype: float64
     dims:
-    - number_of_event_repetitions
+    - number_of_events
     shape:
     - null
-    doc: The timestamps at which the event occurred.
+    doc: The timestamps at which the events occurred.
