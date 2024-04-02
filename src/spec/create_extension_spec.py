@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os.path
 
-from pynwb.spec import NWBNamespaceBuilder, export_spec, NWBGroupSpec, NWBAttributeSpec, NWBRefSpec, NWBDatasetSpec
+from pynwb.spec import NWBNamespaceBuilder, export_spec, NWBGroupSpec, NWBAttributeSpec, NWBDatasetSpec
 
 
 def main():
@@ -48,7 +48,6 @@ def main():
         name="units_region",
         neurodata_type_inc="DynamicTableRegion",
         doc="A reference to the Units table region that contains the units of the data.",
-        # dtype=NWBRefSpec(target_type="Units", reftype="region"),
         shape=[None],
         dims=["number_of_units"],
         quantity="?",
