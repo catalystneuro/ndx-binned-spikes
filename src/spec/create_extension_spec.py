@@ -45,10 +45,10 @@ def main():
     )
     
     units_region = NWBDatasetSpec(
-        name="units",
+        name="units_region",
         neurodata_type_inc="DynamicTableRegion",
         doc="A reference to the Units table region that contains the units of the data.",
-        dtype=NWBRefSpec(target_type="Units", reftype="region"),
+        # dtype=NWBRefSpec(target_type="Units", reftype="region"),
         shape=[None],
         dims=["number_of_units"],
         quantity="?",

@@ -35,7 +35,7 @@ class BinnedAlignedSpikes(NWBDataInterface):
         "milliseconds_from_event_to_first_bin",
         "data",
         "event_timestamps",
-        "units",
+        {"name":"units_region", "child":True},
     )
 
     DEFAULT_NAME = "BinnedAlignedSpikes"
@@ -85,7 +85,7 @@ class BinnedAlignedSpikes(NWBDataInterface):
             "shape": (None,),
         },
         {
-            "name": "units",
+            "name": "units_region",
             "type": DynamicTableRegion,
             "doc": "A reference to the Units table region that contains the units of the data.",
             "default": None,

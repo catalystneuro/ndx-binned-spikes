@@ -16,7 +16,7 @@ def mock_BinnedAlignedSpikes(
     seed: int = 0,
     event_timestamps: Optional[np.ndarray] = None,
     data: Optional[np.ndarray] = None,
-    units: Optional[DynamicTableRegion] = None,
+    units_region: Optional[DynamicTableRegion] = None,
 ) -> "BinnedAlignedSpikes":
     """
     Generate a mock BinnedAlignedSpikes object with specified parameters or from given data.
@@ -42,7 +42,7 @@ def mock_BinnedAlignedSpikes(
         A 3D array of shape (number_of_units, number_of_events, number_of_bins) representing
         the binned spike data. If provided, it overrides the generation of mock data based on other parameters.
         Its shape should match the expected number of units, event repetitions, and bins.
-    units: DynamicTableRegion, optional
+    units_region: DynamicTableRegion, optional
         A reference to the Units table region that contains the units of the data.
 
     Returns
@@ -89,7 +89,7 @@ def mock_BinnedAlignedSpikes(
         milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
         data=data,
         event_timestamps=event_timestamps,
-        units=units
+        units_region=units_region
     )
     return binned_aligned_spikes
 

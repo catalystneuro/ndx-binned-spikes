@@ -90,11 +90,11 @@ class TestBinnedAlignedSpikesConstructor(TestCase):
             milliseconds_from_event_to_first_bin=self.milliseconds_from_event_to_first_bin,
             data=self.data,
             event_timestamps=self.event_timestamps,
-            units=units_region,
+            units_region=units_region,
         )
 
-        unit_table_indices = binned_aligned_spikes.units.data
-        unit_table_names = binned_aligned_spikes.units.table["unit_name"][unit_table_indices]
+        unit_table_indices = binned_aligned_spikes.units_region.data
+        unit_table_names = binned_aligned_spikes.units_region.table["unit_name"][unit_table_indices]
 
         expected_names = [unit_name_a, unit_name_c]
         self.assertListEqual(unit_table_names, expected_names)
@@ -156,14 +156,14 @@ class TestBinnedAlignedSpikesSimpleRoundtrip(TestCase):
 
     def test_roundtrip_with_units_table(self):
 
-        units = mock_Units(num_units=10)
+        units = mock_Units(num_units=3)
         self.nwbfile.units = units
-        region_indices = [0, 3, 5]
+        region_indices = [0, 3]
         units_region = DynamicTableRegion(
             data=region_indices, table=units, description="region of units table", name="units_region"
         )
 
-        binned_aligned_spikes_with_region = mock_BinnedAlignedSpikes(units=units_region)
+        binned_aligned_spikes_with_region = mock_BinnedAlignedSpikes(units_region=units_region)
         self.nwbfile.add_acquisition(binned_aligned_spikes_with_region)
 
     
@@ -173,5 +173,5 @@ class TestBinnedAlignedSpikesSimpleRoundtrip(TestCase):
         with NWBHDF5IO(self.path, mode="r", load_namespaces=True) as io:
             read_nwbfile = io.read()
             read_container = read_nwbfile.acquisition["BinnedAlignedSpikes"]
-            self.assertContainerEqual(self.binned_aligned_spikes, read_container)
+            self.assertContainerEqual(binned_aligned_spikes_with_region, read_container)
 

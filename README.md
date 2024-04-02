@@ -160,7 +160,7 @@ binned_aligned_spikes = BinnedAlignedSpikes(
     milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
     description=description,
     name=name,
-    units=units_region,
+    units_region=units_region,
 )
 
 
