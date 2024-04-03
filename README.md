@@ -6,7 +6,7 @@
 ## Installation
 Python:
 ```bash
-pip install -U ndx-binned-spikes
+pip install -U git+https://github.com/catalystneuro/ndx-binned-spikes.git
 ```
 
 ## Usage
