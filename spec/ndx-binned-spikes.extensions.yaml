@@ -46,9 +46,5 @@ groups:
     doc: The timestamps at which the events occurred.
   - name: units_region
     neurodata_type_inc: DynamicTableRegion
-    dims:
-    - number_of_units
-    shape:
-    - null
     doc: A reference to the Units table region that contains the units of the data.
     quantity: '?'
