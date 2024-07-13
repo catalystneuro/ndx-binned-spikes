@@ -48,8 +48,6 @@ def main():
         name="units_region",
         neurodata_type_inc="DynamicTableRegion",
         doc="A reference to the Units table region that contains the units of the data.",
-        shape=[None],
-        dims=["number_of_units"],
         quantity="?",
         
     )
