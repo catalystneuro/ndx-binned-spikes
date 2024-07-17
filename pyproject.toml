@@ -4,26 +4,25 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ndx-binned-spikes"
-version = "0.1.0-alpha.1"
+version = "0.1.0"
 authors = [
     { name="Ben Dicther", email="ben.dichter@gmail.com" },
     { name="Heberto Mayorquin", email="h.mayorquin@gmail.com" },
 ]
 description = "to-do"
 readme = "README.md"
-# requires-python = ">=3.8"
+requires-python = ">=3.9"
 license = {text = "MIT"}
 classifiers = [
-    # TODO: add classifiers before release
-    # "Programming Language :: Python",
-    # "Programming Language :: Python :: 3.9",
-    # "Programming Language :: Python :: 3.10",
-    # "Programming Language :: Python :: 3.11",
-    # "Programming Language :: Python :: 3.12",
-    # "Development Status :: 4 - Beta",
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
 ]
 keywords = [
     'NeurodataWithoutBorders',
@@ -34,16 +33,14 @@ keywords = [
 dependencies = [
     "pynwb>=2.5.0",
     "hdmf>=3.10.0",
-    "numpy<2.0"
 ]
 
-# TODO: add URLs before release
-# [project.urls]
-# "Homepage" = "https://github.com/organization/package"
-# "Documentation" = "https://package.readthedocs.io/"
-# "Bug Tracker" = "https://github.com/organization/package/issues"
-# "Discussions" = "https://github.com/organization/package/discussions"
-# "Changelog" = "https://github.com/organization/package/blob/main/CHANGELOG.md"
+[project.urls]
+"Homepage" = "https://github.com/catalystneuro/ndx-binned-spikes"
+"Documentation" = "https://github.com/catalystneuro/ndx-binned-spikes"
+"Bug Tracker" = "https://github.com/catalystneuro/ndx-binned-spikes/issues"
+"Discussions" = "https://github.com/catalystneuro/ndx-binned-spikes/discussions"
+"Changelog" = "https://github.com/catalystneuro/ndx-binned-spikes/blob/main/CHANGELOG.md"
 
 [tool.hatch.build]
 include = [
