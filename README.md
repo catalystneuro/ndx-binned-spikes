@@ -81,7 +81,7 @@ The structure of the bins are characterized with the following parameters:
 
 
 <div style="text-align: center;">
-    <img src="./assets/parameters.svg" alt="Parameter meaning" style="width: 75%; height: auto;">
+    <img src="https://raw.githubusercontent.com/catalystneuro/ndx-binned-spikes/main/assets/parameters.svg" alt="Parameter meaning" style="width: 75%; height: auto;">
 </div>
 
 Note that in the diagram above, the `milliseconds_from_event_to_first_bin` is negative.
@@ -96,7 +96,7 @@ The first dimension of `data` works almost like a dictionary. That is, you selec
 
 The following diagram illustrates the structure of the data for a concrete example:
 <div style="text-align: center;">
-<img src="./assets/data.svg" alt="Data meaning" style="width: 75%; height: auto;">
+<img src="https://raw.githubusercontent.com/catalystneuro/ndx-binned-spikes/main/assets/data.svg" alt="Data meaning" style="width: 75%; height: auto;">
 </div>
 
 
