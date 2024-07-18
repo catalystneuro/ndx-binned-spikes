@@ -11,7 +11,7 @@ pip install -U git+https://github.com/catalystneuro/ndx-binned-spikes.git
 
 ## Usage
 
-The `BinnedAlignedSpikes` object is designed to store counts of spikes around a set of events (e.g., stimuli or behavioral events such as licks). The events are characterized by their timestamps and a bin data structure is used to store the spike counts around each of the event timestamps. The `BinnedAlignedSpikes` object keeps a separate count for each of the units (e.g., neurons), in other words, the spikes of the units are counted separately but aligned to the same set of events.
+The `BinnedAlignedSpikes` object is designed to store counts of spikes around a set of events (e.g., stimuli or behavioral events such as licks). The events are characterized by their timestamps and a bin data structure is used to store the spike counts around each of the event timestamps. The `BinnedAlignedSpikes` object keeps a separate count for each of the units (i.e. neurons), in other words, the spikes of the units are counted separately but aligned to the same set of events.
 
 ### Simple example
 The following code illustrates a minimal use of this extension:
@@ -23,15 +23,15 @@ from ndx_binned_spikes import BinnedAlignedSpikes
 
 data = np.array(
     [
-        [  # Data of the first unit
-            [5, 1, 3, 2],  # First timestamp bins
-            [6, 3, 4, 3],  # Second timestamp bins
-            [4, 2, 1, 4],  # Third timestamp bins
+        [  # Data of unit with index 0
+            [5, 1, 3, 2],  # Bin counts around the first timestamp
+            [6, 3, 4, 3],  # Bin counts around the second timestamp
+            [4, 2, 1, 4],  # Bin counts around the third timestamp
         ],
-        [ # Data of the second unit
-            [8, 4, 0, 2],  # First timestamp bins
-            [3, 3, 4, 2],  # Second timestamp bins
-            [2, 7, 4, 1],  # Third timestamp bins
+        [ # Data of unit with index 1
+            [8, 4, 0, 2],  # Bin counts around the first timestamp
+            [3, 3, 4, 2],  # Bin counts around the second timestamp
+            [2, 7, 4, 1],  # Bin counts around the third timestamp
         ],
     ],
 )
@@ -137,15 +137,15 @@ from hdmf.common import DynamicTableRegion
 # Now we create the BinnedAlignedSpikes object and link it to the units table
 data = np.array(
     [
-        [  # Data of the unit 1
-            [5, 1, 3, 2],  # First timestamp bins
-            [6, 3, 4, 3],  # Second timestamp bins
-            [4, 2, 1, 4],  # Third timestamp bins
+        [  # Data of the unit 1 in the units table
+            [5, 1, 3, 2],  # Bin counts around the first timestamp
+            [6, 3, 4, 3],  # Bin counts around the second timestamp 
+            [4, 2, 1, 4],  # Bin counts around the third timestamp
         ],
-        [ # Data of the unit 3
-            [8, 4, 0, 2],  # First timestamp bins
-            [3, 3, 4, 2],  # Second timestamp bins
-            [2, 7, 4, 1],  # Third timestamp bins
+        [ # Data of the unit 3 in the units table
+            [8, 4, 0, 2],  # Bin counts around the first timestamp
+            [3, 3, 4, 2],  # Bin counts around the second timestamp
+            [2, 7, 4, 1],  # Bin counts around the third timestamp
         ],
     ],
 )

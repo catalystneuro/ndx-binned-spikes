@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ndx-binned-spikes"
-version = "0.1.0"
+version = "0.1.0alpha"
 authors = [
     { name="Ben Dicther", email="ben.dichter@gmail.com" },
     { name="Heberto Mayorquin", email="h.mayorquin@gmail.com" },
@@ -42,21 +42,14 @@ dependencies = [
 "Discussions" = "https://github.com/catalystneuro/ndx-binned-spikes/discussions"
 "Changelog" = "https://github.com/catalystneuro/ndx-binned-spikes/blob/main/CHANGELOG.md"
 
-[tool.hatch.build]
-include = [
-    "src/pynwb",
-    "spec/ndx-binned-spikes.extensions.yaml",
-    "spec/ndx-binned-spikes.namespace.yaml",
-]
-exclude = [
-    "src/pynwb/tests",
-]
+
 
 [tool.hatch.build.targets.wheel]
 packages = [
     "src/pynwb/ndx_binned_spikes",
-    "spec"
+    "spec",
 ]
+
 
 [tool.hatch.build.targets.wheel.sources]
 "spec" = "ndx_binned_spikes/spec"
@@ -68,8 +61,10 @@ include = [
     "spec/ndx-binned-spikes.namespace.yaml",
     "docs",
 ]
-exclude = []
-
+exclude = [
+    ".git*",
+    "src/matnwb",
+]
 [tool.pytest.ini_options]
 # uncomment below to run pytest with code coverage reporting. NOTE: breakpoints may not work
 # addopts = "--cov --cov-report html"
