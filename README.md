@@ -1,9 +1,14 @@
 # ndx-binned-spikes Extension for NWB
 
-⚠️ **Warning: This extension is currently in alpha and subject to change before the first release.**
-
-
 ## Installation
+The extension is already available on [PyPI](https://pypi.org/project/ndx-binned-spikes/) and can be installed using pip. The following command installs the latest version of the extension:
+Python:
+```bash
+pip install -U ndx-binned-spikes
+```
+
+If you want to install the development version of the extension you can install it directly from the GitHub repository. The following command installs the development version of the extension:
+
 Python:
 ```bash
 pip install -U git+https://github.com/catalystneuro/ndx-binned-spikes.git
