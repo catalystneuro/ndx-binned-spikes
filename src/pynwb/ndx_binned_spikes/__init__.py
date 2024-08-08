@@ -107,7 +107,7 @@ class BinnedAlignedSpikes(NWBDataInterface):
         for key in kwargs:
             setattr(self, key, kwargs[key])
 
-@register_class(neurodata_type="BinnedAlignedSpikes", namespace="ndx-binned-spikes")  # noqa
+@register_class(neurodata_type="AggregatedBinnedAlignedSpikes", namespace="ndx-binned-spikes")  # noqa
 class AggregatedBinnedAlignedSpikes(NWBDataInterface):
     __nwbfields__ = (
         "name",
