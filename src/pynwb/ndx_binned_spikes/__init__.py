@@ -160,7 +160,7 @@ class AggregatedBinnedAlignedSpikes(NWBDataInterface):
             ),
         },
         {
-            "name": "event_index",
+            "name": "event_indices",
             "type": "array_data",
             "doc": "The timestamps at which the events occurred.",
             "shape": (None,),
@@ -181,7 +181,14 @@ class AggregatedBinnedAlignedSpikes(NWBDataInterface):
         for key in kwargs:
             setattr(self, key, kwargs[key])
         
-
+    # Should this return an instance of BinnedAlignedSpikes or just the data as it is?
+    # Going with the simple one for the moment
+    def get_data_for_stimuli(self, event_index):
+        
+        mask = self.event_indices == event_index
+        binned_spikes_for_unit = self.data[:, mask, :]
+        
+        return binned_spikes_for_unit
 
 
 # Remove these functions from the package

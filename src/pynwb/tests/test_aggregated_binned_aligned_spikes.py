@@ -20,7 +20,7 @@ class TestAggregatedBinnedAlignedSpikesConstructor(TestCase):
         self.milliseconds_from_event_to_first_bin = -100.0        
 
         # Two units in total and 4 bins, and event with two timestamps
-        data_for_first_event_instance = np.array(
+        self.data_for_first_event_instance = np.array(
             [
                 # Unit 1 data
                 [
@@ -36,7 +36,7 @@ class TestAggregatedBinnedAlignedSpikesConstructor(TestCase):
         )
 
         # Also two units and 4 bins but this event appeared three times
-        data_for_second_event_instance = np.array(
+        self.data_for_second_event_instance = np.array(
             [
                 # Unit 1 data
                 [
@@ -53,14 +53,14 @@ class TestAggregatedBinnedAlignedSpikesConstructor(TestCase):
             ]
         )
 
-        self.event_index = np.concatenate(
+        self.event_indices = np.concatenate(
             [
                 np.full(instance.shape[1], i)
-                for i, instance in enumerate([data_for_first_event_instance, data_for_second_event_instance])
+                for i, instance in enumerate([self.data_for_first_event_instance, self.data_for_second_event_instance])
             ]
         )
 
-        self.data = np.concatenate([data_for_first_event_instance, data_for_second_event_instance], axis=1)
+        self.data = np.concatenate([self.data_for_first_event_instance, self.data_for_second_event_instance], axis=1)
 
 
     def test_constructor(self):
@@ -70,11 +70,11 @@ class TestAggregatedBinnedAlignedSpikesConstructor(TestCase):
             bin_width_in_milliseconds=self.bin_width_in_milliseconds,
             milliseconds_from_event_to_first_bin=self.milliseconds_from_event_to_first_bin,
             data=self.data,
-            event_index=self.event_index,
+            event_indices=self.event_indices,
         )
 
         np.testing.assert_array_equal(aggregated_binnned_align_spikes.data, self.data)
-        np.testing.assert_array_equal(aggregated_binnned_align_spikes.event_index, self.event_index)
+        np.testing.assert_array_equal(aggregated_binnned_align_spikes.event_indices, self.event_indices)
         self.assertEqual(aggregated_binnned_align_spikes.bin_width_in_milliseconds, self.bin_width_in_milliseconds)
         self.assertEqual(
             aggregated_binnned_align_spikes.milliseconds_from_event_to_first_bin, self.milliseconds_from_event_to_first_bin
@@ -83,3 +83,18 @@ class TestAggregatedBinnedAlignedSpikesConstructor(TestCase):
         self.assertEqual(aggregated_binnned_align_spikes.data.shape[0], self.number_of_units)
         self.assertEqual(aggregated_binnned_align_spikes.data.shape[1], self.number_of_events)
         self.assertEqual(aggregated_binnned_align_spikes.data.shape[2], self.number_of_bins)
+
+
+    def test_get_single_event_data_method(self):
+        
+        aggregated_binnned_align_spikes = AggregatedBinnedAlignedSpikes(
+            bin_width_in_milliseconds=self.bin_width_in_milliseconds,
+            milliseconds_from_event_to_first_bin=self.milliseconds_from_event_to_first_bin,
+            data=self.data,
+            event_indices=self.event_indices,
+        )
+        
+        
+        data_for_stimuli_1 = aggregated_binnned_align_spikes.get_data_for_stimuli(event_index=0)
+        
+        np.testing.assert_allclose(data_for_stimuli_1, self.data_for_first_event_instance)

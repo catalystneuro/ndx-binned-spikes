@@ -86,7 +86,7 @@ groups:
     doc: The binned data. It should be an array whose first dimension is the number
       of units, the second dimension is the total number of events of all stimuli,
       and the third dimension is the number of bins.
-  - name: event_index
+  - name: event_indices
     dtype: int64
     dims:
     - number_of_events
