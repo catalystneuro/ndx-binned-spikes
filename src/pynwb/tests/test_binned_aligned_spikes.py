@@ -1,6 +1,4 @@
 """Unit and integration tests for the example BinnedAlignedSpikes extension neurodata type.
-
-TODO: Modify these tests to test your extension neurodata type.
 """
 
 import numpy as np
