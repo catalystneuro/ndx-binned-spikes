@@ -114,8 +114,10 @@ def main():
         neurodata_type_def="AggregatedBinnedAlignedSpikes",
         neurodata_type_inc="NWBDataInterface",
         default_name="AggregatedBinnedAlignedSpikes",
-        doc="A data interface for aggregated binned spike data aligned to an multiple events (e.g. a stimuli or the beginning of a trial).",
-        datasets=[aggregated_binned_aligned_spikes_data, event_indices, units_region],
+        doc=(
+            "A data interface for aggregated binned spike data aligned to multiple events "
+            "(e.g. a stimuli or the beginning of a trial)."
+        ),        datasets=[aggregated_binned_aligned_spikes_data, event_indices, units_region],
         attributes=[
             NWBAttributeSpec(
                 name="name",
