@@ -106,6 +106,80 @@ class BinnedAlignedSpikes(NWBDataInterface):
 
         for key in kwargs:
             setattr(self, key, kwargs[key])
+
+@register_class(neurodata_type="BinnedAlignedSpikes", namespace="ndx-binned-spikes")  # noqa
+class AggregatedBinnedAlignedSpikes(NWBDataInterface):
+    __nwbfields__ = (
+        "name",
+        "description",
+        "bin_width_in_milliseconds",
+        "milliseconds_from_event_to_first_bin",
+        "data",
+        "event_timestamps",
+        {"name":"units_region", "child":True},  #TODO, I forgot why this is included
+    )
+
+    DEFAULT_NAME = "AggregatedBinnedAlignedSpikes"
+    DEFAULT_DESCRIPTION = "Spikes data binned and aligned from multiple events."
+
+    @docval(
+        {
+            "name": "name",
+            "type": str,
+            "doc": "The name of this container",
+            "default": DEFAULT_NAME,
+        },
+        {
+            "name": "description",
+            "type": str,
+            "doc": "A description of what the data represents",
+            "default": DEFAULT_DESCRIPTION,
+        },
+        {
+            "name": "bin_width_in_milliseconds",
+            "type": float,
+            "doc": "The length in milliseconds of the bins",
+        },
+        {
+            "name": "milliseconds_from_event_to_first_bin",
+            "type": float,
+            "doc": (
+                "The time in milliseconds from the event to the beginning of the first bin. A negative value indicates"
+                "that the first bin is before the event whereas a positive value indicates that the first bin is "
+                "after the event." 
+            ),
+            "default": 0.0,
+        },
+        {
+            "name": "data",
+            "type": "array_data",
+            "shape": [(None, None, None)],
+            "doc": (
+                "The binned data. It should be an array whose first dimension is the number of units, "
+                "the second dimension is the number of events, and the third dimension is the number of bins."
+            ),
+        },
+        {
+            "name": "event_index",
+            "type": "array_data",
+            "doc": "The timestamps at which the events occurred.",
+            "shape": (None,),
+        },
+        {
+            "name": "units_region",
+            "type": DynamicTableRegion,
+            "doc": "A reference to the Units table region that contains the units of the data.",
+            "default": None,
+        },
+    )
+    def __init__(self, **kwargs):
+
+
+        name = kwargs.pop("name")
+        super().__init__(name=name)
+
+        for key in kwargs:
+            setattr(self, key, kwargs[key])
         
 
 
