@@ -180,7 +180,10 @@ binned_aligned_spikes = BinnedAlignedSpikes(
 As with the previous example this can be then added to a processing module in an NWB file and written to disk using exactly the same code as before.
 
 ### Storing data from multiple events together
-In some cases, it is useful to store the data from multiple events together. For example, there are experiments where many stimuli are presented to the subject in a single session, and it might be desirable to store all the aggregated counts in a single object. For those cases, the `AggregatedBinnedAlignedSpikes` object can be used. This object is similar to the `BinnedAlignedSpikes` object but stores the data from all the events (in this case stimuli) together. Because not all events appear the same number of times, the `AggregatedBinnedAlignedSpikes` object stores a third variable, `event_indices`, that indicates which event each of the counts corresponds to. The object is created in the following way:
+In experiments where multiple stimuli are presented to a subject within a single session, it is often useful to store the aggregated spike counts from all events in a single object. For such cases, the `AggregatedBinnedAlignedSpikes` object is ideal. This object functions similarly to the `BinnedAlignedSpikes` object but is designed to store data from multiple events (e.g., different stimuli) together.
+
+Since events may not occur the same number of times, an homogeneous data structure is not possible. Therefore the `AggregatedBinnedAlignedSpikes` object includes an additional variable, event_indices, to indicate which event each set of counts corresponds to. You can create this object as follows:
+
 
 ```python
 from ndx_binned_spikes import AggregatedBinnedAlignedSpikes
@@ -194,14 +197,15 @@ aggregated_binned_aligned_spikes = AggregatedBinnedAlignedSpikes(
 )
 ```
 
-Where `aggregated_events_counts` is the number of repetitions of all the events for which we are aggregating data. For example, if we are aggregating data from two stimuli and the first stimulus appeared twice and the second stimulus appeared three times, then `aggregated_events_counts` would be 5.
+The `aggregated_events_counts` represents the total number of repetitions for all the events being aggregated. For example, if data is being aggregated from two stimuli where the first stimulus appeared twice and the second appeared three times, the aggregated_events_counts would be 5.
 
-The `event_indices` is an indicator vector which should be constructed such that `data[:, event_indices==event_index, :]` would correspond to the binned spike counts around the event with index `event_index`. The same data can be returned by calling the convenience method `aggregated_binned_aligned_spikes.get_data_for_event(event_index)`.
+The `event_indices` is an indicator vector that should be constructed so that `data[:, event_indices == event_index, :]` corresponds to the binned spike counts around the event with the specified event_index. You can retrieve the same data using the convenience method `aggregated_binned_aligned_spikes.get_data_for_event(event_index)`.
 
-Note as well that the timestamps need to be in ascending order and that they would map positionally to the event indices and the second dimension of the data. If they do not, then a `ValueError` will be raised. A convenience method `AggregatedBinnedAlignedSpikes.sort_data_by_timestamps(data=data, timestamps=timestamps, event_indices=event_indices)` is provided that returns the data organized as expected. It can be used like this:
+It's important to note that the timestamps must be in ascending order and must correspond positionally to the event indices and the second dimension of the data. If they are not, a ValueError will be raised. To help organize the data correctly, you can use the convenience method `AggregatedBinnedAlignedSpikes.sort_data_by_timestamps(data=data, timestamps=timestamps, event_indices=event_indices)`, which ensures the data is properly sorted. Here’s how it can be used:
 
 ```python
 sorted_data, sorted_timestamps, sorted_event_indices = AggregatedBinnedAlignedSpikes.sort_data_by_timestamps(data=data, timestamps=timestamps, event_indices=event_indices)
+
 aggregated_binned_aligned_spikes = AggregatedBinnedAlignedSpikes(
     bin_width_in_milliseconds=bin_width_in_milliseconds,
     milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
@@ -230,7 +234,7 @@ aggregated_binned_aligned_spikes = AggregatedBinnedAlignedSpikes(
 
 #### Example of building an `AggregatedBinnedAlignedSpikes` object from scratch
 
-To make the example more concrete and further the understanding of how this object works, let's work through the following example. Suppose that we have data for two distinct events (say two different stimuli) as we would have for the `BinnedAlignedSpikes` examples above and their timestamps:
+To better understand how this object works, let's consider a specific example. Suppose we have data for two distinct events (such as two different stimuli) and their associated timestamps, similar to the `BinnedAlignedSpikes` examples mentioned earlier:
 
 ```python
 import numpy as np
