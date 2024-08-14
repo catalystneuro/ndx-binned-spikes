@@ -179,5 +179,131 @@ binned_aligned_spikes = BinnedAlignedSpikes(
 
 As with the previous example this can be then added to a processing module in an NWB file and written to disk using exactly the same code as before.
 
+### Storing data from multiple events together
+In some cases, it is useful to store the data from multiple events together. For example, there are experiments where many stimuli are presented to the subject in a single session, and it might be desirable to store all the aggregated counts in a single object. For those cases, the `AggregatedBinnedAlignedSpikes` object can be used. This object is similar to the `BinnedAlignedSpikes` object but stores the data from all the events (in this case stimuli) together. Because not all events appear the same number of times, the `AggregatedBinnedAlignedSpikes` object stores a third variable, `event_indices`, that indicates which event each of the counts corresponds to. The object is created in the following way:
+
+```python
+from ndx_binned_spikes import AggregatedBinnedAlignedSpikes
+
+aggregated_binned_aligned_spikes = AggregatedBinnedAlignedSpikes(
+    bin_width_in_milliseconds=bin_width_in_milliseconds,
+    milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
+    data=data,  # Shape (number_of_units, aggregated_events_counts, number_of_bins)
+    timestamps=timestamps,  # As many timestamps as the second dimension of data
+    event_indices=event_indices,  # An index indicating which event each of the counts corresponds to
+)
+```
+
+Where `aggregated_events_counts` is the number of repetitions of all the events for which we are aggregating data. For example, if we are aggregating data from two stimuli and the first stimulus appeared twice and the second stimulus appeared three times, then `aggregated_events_counts` would be 5.
+
+The `event_indices` is an indicator vector which should be constructed such that `data[:, event_indices==event_index, :]` would correspond to the binned spike counts around the event with index `event_index`. The same data can be returned by calling the convenience method `aggregated_binned_aligned_spikes.get_data_for_event(event_index)`.
+
+Note as well that the timestamps need to be in ascending order and that they would map positionally to the event indices and the second dimension of the data. If they do not, then a `ValueError` will be raised. A convenience method `AggregatedBinnedAlignedSpikes.sort_data_by_timestamps(data=data, timestamps=timestamps, event_indices=event_indices)` is provided that returns the data organized as expected. It can be used like this:
+
+```python
+sorted_data, sorted_timestamps, sorted_event_indices = AggregatedBinnedAlignedSpikes.sort_data_by_timestamps(data=data, timestamps=timestamps, event_indices=event_indices)
+aggregated_binned_aligned_spikes = AggregatedBinnedAlignedSpikes(
+    bin_width_in_milliseconds=bin_width_in_milliseconds,
+    milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
+    data=sorted_data,   
+    timestamps=sorted_timestamps,  
+    event_indices=sorted_event_indices,  
+)
+```
+
+The same can be achieved by using the following script:
+
+```python
+sorted_indices = np.argsort(timestamps)
+sorted_data = data[:, sorted_indices, :]
+sorted_timestamps = timestamps[sorted_indices]
+sorted_event_indices = event_indices[sorted_indices]
+
+aggregated_binned_aligned_spikes = AggregatedBinnedAlignedSpikes(
+    bin_width_in_milliseconds=bin_width_in_milliseconds,
+    milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
+    data=sorted_data,   
+    timestamps=sorted_timestamps,  
+    event_indices=sorted_event_indices,  
+)
+```
+
+#### Example of building an `AggregatedBinnedAlignedSpikes` object from scratch
+
+To make the example more concrete and further the understanding of how this object works, let's work through the following example. Suppose that we have data for two distinct events (say two different stimuli) as we would have for the `BinnedAlignedSpikes` examples above and their timestamps:
+
+```python
+import numpy as np
+
+# Two units and 4 bins
+data_for_first_event = np.array(
+    [
+        # Unit 1
+        [
+            [0, 1, 2, 3],  # Bin counts around the first timestamp
+            [4, 5, 6, 7],  # Bin counts around the second timestamp
+        ],
+        # Unit 2
+        [
+            [8, 9, 10, 11],  # Bin counts around the first timestamp
+            [12, 13, 14, 15],  # Bin counts around the second timestamp
+        ],
+    ],
+)
+
+# Also two units and 4 bins but this event appeared three times
+data_for_second_event = np.array(
+    [
+        # Unit 1
+        [
+            [0, 1, 2, 3],  # Bin counts around the first timestamp
+            [4, 5, 6, 7],  # Bin counts around the second timestamp
+            [8, 9, 10, 11],  # Bin counts around the third timestamp
+        ],
+        # Unit 2
+        [
+            [12, 13, 14, 15],  # Bin counts around the first timestamp
+            [16, 17, 18, 19],  # Bin counts around the second timestamp
+            [20, 21, 22, 23],  # Bin counts around the third timestamp
+        ],
+    ]
+)
+
+timestamps_first_event = [5.0, 15.0]
+timestamps_second_event = [1.0, 10.0, 20.0]
+```
+
+The way that we would build the data for the `AggregatedBinnedAlignedSpikes` object is as follows:
+
+```python
+from ndx_binned_spikes import AggregatedBinnedAlignedSpikes
+
+bin_width_in_milliseconds = 100.0
+milliseconds_from_event_to_first_bin = -50.0
+
+data = np.concatenate([data_for_first_event, data_for_second_event], axis=1)
+timestamps = np.concatenate([timestamps_first_event, timestamps_second_event])
+event_indices = np.concatenate([np.zeros(2), np.ones(3)])
+
+sorted_data, sorted_timestamps, sorted_event_indices = AggregatedBinnedAlignedSpikes.sort_data_by_timestamps(data=data, timestamps=timestamps, event_indices=event_indices)
+
+aggregated_binned_aligned_spikes = AggregatedBinnedAlignedSpikes(
+    bin_width_in_milliseconds=bin_width_in_milliseconds,
+    milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
+    data=sorted_data,   
+    timestamps=sorted_timestamps,  
+    event_indices=sorted_event_indices,  
+)
+```
+
+Then we can recover the original data by calling the `get_data_for_event` method:
+
+```python
+retrieved_data_for_first_event = aggregated_binned_aligned_spikes.get_data_for_stimuli(event_index=0)
+np.testing.assert_array_equal(retrieved_data_for_first_event, data_for_first_event)
+```
+
+The `AggregatedBinnedAlignedSpikes` object can be added to a processing module in an NWB file and written to disk using the same code as before. Plus, a region of the `Units` table can be linked to the `AggregatedBinnedAlignedSpikes` object in the same way as it was done for the `BinnedAlignedSpikes` object.
+
 ---
 This extension was created using [ndx-template](https://github.com/nwb-extensions/ndx-template).

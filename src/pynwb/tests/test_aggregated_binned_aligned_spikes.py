@@ -57,7 +57,7 @@ class TestAggregatedBinnedAlignedSpikesConstructor(TestCase):
         )
 
         self.timestamps_first_event = [5.0, 15.0]
-        self.timestamps_second_event = [1.0, 10.0, 35.0]
+        self.timestamps_second_event = [0.0, 10.0, 20.0]
 
         self.event_indices = np.concatenate(
             [
