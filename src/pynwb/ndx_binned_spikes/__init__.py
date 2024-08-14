@@ -186,19 +186,21 @@ class AggregatedBinnedAlignedSpikes(NWBDataInterface):
         name = kwargs.pop("name")
         super().__init__(name=name)
 
-        # # Sort the data by the timestamps
-        # timestamps = kwargs["timestamps"]
-        # event_indices = kwargs["event_indices"]
-        # data = kwargs["data"]
+        timestamps = kwargs["timestamps"]
+        event_indices = kwargs["event_indices"]
+        data = kwargs["data"]
 
-        # sorted_indices = np.argsort(timestamps)
-        # data = data[:, sorted_indices, :]
-        # timestamps = timestamps[sorted_indices]
-        # event_indices = event_indices[sorted_indices]
+        assert data.shape[1] == timestamps.shape[0], "The number of timestamps must match the second axis of data."
+        assert event_indices.shape[0] == timestamps.shape[0], "The number of timestamps must match the event_indices."
 
-        # kwargs["data"] = data
-        # kwargs["timestamps"] = timestamps
-        # kwargs["event_indices"] = event_indices
+        # Assert timestamps are monotonically increasing
+        if not np.all(np.diff(kwargs["timestamps"]) >= 0):
+            error_msg = (
+                "The timestamps must be monotonically increasing and the data and event_indices "
+                "must be sorted by timestamps. Use the `sort_data_by_timestamps` method to do this "
+                "automatically before passing the data to the constructor."
+            )
+            raise ValueError(error_msg)
 
         for key in kwargs:
             setattr(self, key, kwargs[key])
@@ -220,12 +222,12 @@ class AggregatedBinnedAlignedSpikes(NWBDataInterface):
         return timestamps
 
     @staticmethod
-    def sort_data_by_time(
+    def sort_data_by_timestamps(
         data: np.ndarray,
         timestamps: np.ndarray,
         event_indices: np.ndarray,
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-        
+
         sorted_indices = np.argsort(timestamps)
         data = data[:, sorted_indices, :]
         timestamps = timestamps[sorted_indices]

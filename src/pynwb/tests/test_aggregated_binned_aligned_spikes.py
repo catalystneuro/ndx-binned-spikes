@@ -74,11 +74,22 @@ class TestAggregatedBinnedAlignedSpikesConstructor(TestCase):
     def test_constructor(self):
         """Test that the constructor for AggregatedBinnedAlignedSpikes sets values as expected."""
 
-        data, timestamps, event_indices = AggregatedBinnedAlignedSpikes.sort_data_by_time(
+        with self.assertRaises(ValueError):
+            AggregatedBinnedAlignedSpikes(
+                bin_width_in_milliseconds=self.bin_width_in_milliseconds,
+                milliseconds_from_event_to_first_bin=self.milliseconds_from_event_to_first_bin,
+                data=self.data,
+                timestamps=self.timestamps,
+                event_indices=self.event_indices,
+            )
+        
+        
+        data, timestamps, event_indices = AggregatedBinnedAlignedSpikes.sort_data_by_timestamps(
             self.data,
             self.timestamps,
             self.event_indices,
         )
+        
         aggregated_binnned_align_spikes = AggregatedBinnedAlignedSpikes(
             bin_width_in_milliseconds=self.bin_width_in_milliseconds,
             milliseconds_from_event_to_first_bin=self.milliseconds_from_event_to_first_bin,
@@ -104,12 +115,19 @@ class TestAggregatedBinnedAlignedSpikesConstructor(TestCase):
 
     def test_get_single_event_data_methods(self):
 
+        
+        data, timestamps, event_indices = AggregatedBinnedAlignedSpikes.sort_data_by_timestamps(
+            self.data,
+            self.timestamps,
+            self.event_indices,
+        )
+
         aggregated_binnned_align_spikes = AggregatedBinnedAlignedSpikes(
             bin_width_in_milliseconds=self.bin_width_in_milliseconds,
             milliseconds_from_event_to_first_bin=self.milliseconds_from_event_to_first_bin,
-            data=self.data,
-            timestamps=self.timestamps,
-            event_indices=self.event_indices,
+            data=data,
+            timestamps=timestamps,
+            event_indices=event_indices,
         )
 
         data_for_stimuli_1 = aggregated_binnned_align_spikes.get_data_for_stimuli(event_index=0)
