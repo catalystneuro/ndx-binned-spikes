@@ -51,8 +51,8 @@ class TestAggregatedBinnedAlignedSpikesConstructor(TestCase):
             ]
         )
 
-        self.event_timestamps_first_event = [5.0, 15.0]
-        self.event_timestamps_second_event = [1.0, 10.0, 35.0]
+        self.timestamps_first_event = [5.0, 15.0]
+        self.timestamps_second_event = [1.0, 10.0, 35.0]
 
         self.event_indices = np.concatenate(
             [
@@ -62,9 +62,9 @@ class TestAggregatedBinnedAlignedSpikesConstructor(TestCase):
         )
 
         self.data = np.concatenate([self.data_for_first_event, self.data_for_second_event], axis=1)
-        self.event_timestamps = np.concatenate([self.event_timestamps_first_event, self.event_timestamps_second_event])
+        self.timestamps = np.concatenate([self.timestamps_first_event, self.timestamps_second_event])
 
-        self.sorted_indices = np.argsort(self.event_timestamps)
+        self.sorted_indices = np.argsort(self.timestamps)
 
     def test_constructor(self):
         """Test that the constructor for BinnedAlignedSpikes sets values as expected."""
@@ -73,7 +73,7 @@ class TestAggregatedBinnedAlignedSpikesConstructor(TestCase):
             bin_width_in_milliseconds=self.bin_width_in_milliseconds,
             milliseconds_from_event_to_first_bin=self.milliseconds_from_event_to_first_bin,
             data=self.data,
-            event_timestamps=self.event_timestamps,
+            timestamps=self.timestamps,
             event_indices=self.event_indices,
         )
 
@@ -81,7 +81,7 @@ class TestAggregatedBinnedAlignedSpikesConstructor(TestCase):
         np.testing.assert_array_equal(
             aggregated_binnned_align_spikes.event_indices, self.event_indices[self.sorted_indices]
         )
-        np.testing.assert_array_equal(aggregated_binnned_align_spikes.event_timestamps, self.event_timestamps[self.sorted_indices])
+        np.testing.assert_array_equal(aggregated_binnned_align_spikes.timestamps, self.timestamps[self.sorted_indices])
         self.assertEqual(aggregated_binnned_align_spikes.bin_width_in_milliseconds, self.bin_width_in_milliseconds)
         self.assertEqual(
             aggregated_binnned_align_spikes.milliseconds_from_event_to_first_bin,
@@ -98,7 +98,7 @@ class TestAggregatedBinnedAlignedSpikesConstructor(TestCase):
             bin_width_in_milliseconds=self.bin_width_in_milliseconds,
             milliseconds_from_event_to_first_bin=self.milliseconds_from_event_to_first_bin,
             data=self.data,
-            event_timestamps=self.event_timestamps,
+            timestamps=self.timestamps,
             event_indices=self.event_indices,
             
         )
@@ -110,8 +110,8 @@ class TestAggregatedBinnedAlignedSpikesConstructor(TestCase):
         np.testing.assert_allclose(data_for_stimuli_2, self.data_for_second_event)
 
         timestamps_stimuli_1 = aggregated_binnned_align_spikes.get_timestamps_for_stimuli(event_index=0)
-        np.testing.assert_allclose(timestamps_stimuli_1, self.event_timestamps_first_event)
+        np.testing.assert_allclose(timestamps_stimuli_1, self.timestamps_first_event)
         
         timestamps_stimuli_2 = aggregated_binnned_align_spikes.get_timestamps_for_stimuli(event_index=1)
-        np.testing.assert_allclose(timestamps_stimuli_2, self.event_timestamps_second_event)
+        np.testing.assert_allclose(timestamps_stimuli_2, self.timestamps_second_event)
         

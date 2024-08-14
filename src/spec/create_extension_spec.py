@@ -99,7 +99,15 @@ def main():
         shape=[None, None, None],
         dims=["num_units", "number_of_events", "number_of_bins"],
     )
-    
+
+    timestamps = NWBDatasetSpec(
+        name="timestamps",
+        doc="The timestamps at which the events occurred.",
+        dtype="float64",
+        shape=[None],
+        dims=["number_of_events"],
+    )    
+
     event_indices = NWBDatasetSpec(
         name="event_indices",
         doc="The index of the event that each row of the data corresponds to.",
@@ -115,9 +123,11 @@ def main():
         neurodata_type_inc="NWBDataInterface",
         default_name="AggregatedBinnedAlignedSpikes",
         doc=(
-            "A data interface for aggregated binned spike data aligned to multiple events "
-            "(e.g. a stimuli or the beginning of a trial)."
-        ),        datasets=[aggregated_binned_aligned_spikes_data, event_indices, event_timestamps, units_region],
+            "A data interface for aggregated binned spike data aligned to multiple events. "
+            "The data for all the events is concatenated along the second dimension and a second array, "
+            "event_indices, is used to keep track of which event each row of the data corresponds to."
+        ),        
+        datasets=[aggregated_binned_aligned_spikes_data, event_indices, timestamps, units_region],
         attributes=[
             NWBAttributeSpec(
                 name="name",

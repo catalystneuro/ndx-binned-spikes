@@ -158,9 +158,12 @@ class AggregatedBinnedAlignedSpikes(NWBDataInterface):
             ),
         },
         {
-            "name": "event_timestamps",
+            "name": "timestamps",
             "type": "array_data",
-            "doc": "The timestamps at which the events occurred. It is assume that they map positionally to the second index of the data.",
+            "doc": (
+                "The timestamps at which the events occurred. It is assumed that they map positionally to "
+                "the second index of the data.",
+            ),
             "shape": (None,),
         },
         {
@@ -183,7 +186,7 @@ class AggregatedBinnedAlignedSpikes(NWBDataInterface):
         super().__init__(name=name)
 
         # Sort the data by the timestamps
-        timestamps = kwargs["event_timestamps"]
+        timestamps = kwargs["timestamps"]
         event_indices = kwargs["event_indices"]
         data = kwargs["data"]
         
@@ -193,7 +196,7 @@ class AggregatedBinnedAlignedSpikes(NWBDataInterface):
         event_indices = event_indices[sorted_indices]
         
         kwargs["data"] = data
-        kwargs["event_timestamps"] = timestamps
+        kwargs["timestamps"] = timestamps
         kwargs["event_indices"] = event_indices
         
 
@@ -212,7 +215,7 @@ class AggregatedBinnedAlignedSpikes(NWBDataInterface):
     def get_timestamps_for_stimuli(self, event_index):
         
         mask = self.event_indices == event_index
-        timestamps = self.event_timestamps[mask]
+        timestamps = self.timestamps[mask]
         
         return timestamps
 

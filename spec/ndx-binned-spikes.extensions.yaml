@@ -51,8 +51,10 @@ groups:
 - neurodata_type_def: AggregatedBinnedAlignedSpikes
   neurodata_type_inc: NWBDataInterface
   default_name: AggregatedBinnedAlignedSpikes
-  doc: A data interface for aggregated binned spike data aligned to multiple events
-    (e.g. a stimuli or the beginning of a trial).
+  doc: A data interface for aggregated binned spike data aligned to multiple events.
+    The data for all the events is concatenated along the second dimension and a second
+    array, event_indices, is used to keep track of which event each row of the data
+    corresponds to.
   attributes:
   - name: name
     dtype: text
@@ -93,7 +95,7 @@ groups:
     shape:
     - null
     doc: The index of the event that each row of the data corresponds to.
-  - name: event_timestamps
+  - name: timestamps
     dtype: float64
     dims:
     - number_of_events
