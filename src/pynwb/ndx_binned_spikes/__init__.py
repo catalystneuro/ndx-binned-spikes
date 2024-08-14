@@ -1,5 +1,6 @@
 import os
 import numpy as np
+from typing import Tuple
 from pynwb import load_namespaces, get_class
 from pynwb import register_class
 from pynwb.core import NWBDataInterface
@@ -185,19 +186,19 @@ class AggregatedBinnedAlignedSpikes(NWBDataInterface):
         name = kwargs.pop("name")
         super().__init__(name=name)
 
-        # Sort the data by the timestamps
-        timestamps = kwargs["timestamps"]
-        event_indices = kwargs["event_indices"]
-        data = kwargs["data"]
+        # # Sort the data by the timestamps
+        # timestamps = kwargs["timestamps"]
+        # event_indices = kwargs["event_indices"]
+        # data = kwargs["data"]
 
-        sorted_indices = np.argsort(timestamps)
-        data = data[:, sorted_indices, :]
-        timestamps = timestamps[sorted_indices]
-        event_indices = event_indices[sorted_indices]
+        # sorted_indices = np.argsort(timestamps)
+        # data = data[:, sorted_indices, :]
+        # timestamps = timestamps[sorted_indices]
+        # event_indices = event_indices[sorted_indices]
 
-        kwargs["data"] = data
-        kwargs["timestamps"] = timestamps
-        kwargs["event_indices"] = event_indices
+        # kwargs["data"] = data
+        # kwargs["timestamps"] = timestamps
+        # kwargs["event_indices"] = event_indices
 
         for key in kwargs:
             setattr(self, key, kwargs[key])
@@ -217,6 +218,20 @@ class AggregatedBinnedAlignedSpikes(NWBDataInterface):
         timestamps = self.timestamps[mask]
 
         return timestamps
+
+    @staticmethod
+    def sort_data_by_time(
+        data: np.ndarray,
+        timestamps: np.ndarray,
+        event_indices: np.ndarray,
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+        
+        sorted_indices = np.argsort(timestamps)
+        data = data[:, sorted_indices, :]
+        timestamps = timestamps[sorted_indices]
+        event_indices = event_indices[sorted_indices]
+
+        return data, timestamps, event_indices
 
 
 # Remove these functions from the package

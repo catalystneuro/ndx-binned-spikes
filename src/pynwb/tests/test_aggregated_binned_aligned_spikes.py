@@ -72,14 +72,19 @@ class TestAggregatedBinnedAlignedSpikesConstructor(TestCase):
         self.sorted_indices = np.argsort(self.timestamps)
 
     def test_constructor(self):
-        """Test that the constructor for BinnedAlignedSpikes sets values as expected."""
+        """Test that the constructor for AggregatedBinnedAlignedSpikes sets values as expected."""
 
+        data, timestamps, event_indices = AggregatedBinnedAlignedSpikes.sort_data_by_time(
+            self.data,
+            self.timestamps,
+            self.event_indices,
+        )
         aggregated_binnned_align_spikes = AggregatedBinnedAlignedSpikes(
             bin_width_in_milliseconds=self.bin_width_in_milliseconds,
             milliseconds_from_event_to_first_bin=self.milliseconds_from_event_to_first_bin,
-            data=self.data,
-            timestamps=self.timestamps,
-            event_indices=self.event_indices,
+            data=data,
+            timestamps=timestamps,
+            event_indices=event_indices,
         )
 
         np.testing.assert_array_equal(aggregated_binnned_align_spikes.data, self.data[:, self.sorted_indices, :])
