@@ -51,7 +51,7 @@ groups:
 - neurodata_type_def: AggregatedBinnedAlignedSpikes
   neurodata_type_inc: NWBDataInterface
   default_name: AggregatedBinnedAlignedSpikes
-  doc: A data interface for aggregated binned spike data aligned to an multiple events
+  doc: A data interface for aggregated binned spike data aligned to multiple events
     (e.g. a stimuli or the beginning of a trial).
   attributes:
   - name: name
@@ -93,6 +93,13 @@ groups:
     shape:
     - null
     doc: The index of the event that each row of the data corresponds to.
+  - name: event_timestamps
+    dtype: float64
+    dims:
+    - number_of_events
+    shape:
+    - null
+    doc: The timestamps at which the events occurred.
   - name: units_region
     neurodata_type_inc: DynamicTableRegion
     doc: A reference to the Units table region that contains the units of the data.

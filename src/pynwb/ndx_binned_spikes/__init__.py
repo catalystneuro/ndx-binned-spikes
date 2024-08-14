@@ -1,16 +1,13 @@
 import os
-
+import numpy as np 
 from pynwb import load_namespaces, get_class
 from pynwb import register_class
 from pynwb.core import NWBDataInterface
 from hdmf.utils import docval
 from hdmf.common import DynamicTableRegion
 
-try:
-    from importlib.resources import files
-except ImportError:
-    # TODO: Remove when python 3.9 becomes the new minimum
-    from importlib_resources import files
+from importlib.resources import files
+
 
 # Get path to the namespace.yaml file with the expected location when installed not in editable mode
 __location_of_this_file = files(__name__)
@@ -116,6 +113,7 @@ class AggregatedBinnedAlignedSpikes(NWBDataInterface):
         "milliseconds_from_event_to_first_bin",
         "data",
         "event_timestamps",
+        "event_indices",
         {"name":"units_region", "child":True},  #TODO, I forgot why this is included
     )
 
@@ -160,6 +158,12 @@ class AggregatedBinnedAlignedSpikes(NWBDataInterface):
             ),
         },
         {
+            "name": "event_timestamps",
+            "type": "array_data",
+            "doc": "The timestamps at which the events occurred. It is assume that they map positionally to the second index of the data.",
+            "shape": (None,),
+        },
+        {
             "name": "event_indices",
             "type": "array_data",
             "doc": "The timestamps at which the events occurred.",
@@ -174,9 +178,24 @@ class AggregatedBinnedAlignedSpikes(NWBDataInterface):
     )
     def __init__(self, **kwargs):
 
-
+        
         name = kwargs.pop("name")
         super().__init__(name=name)
+
+        # Sort the data by the timestamps
+        timestamps = kwargs["event_timestamps"]
+        event_indices = kwargs["event_indices"]
+        data = kwargs["data"]
+        
+        sorted_indices = np.argsort(timestamps)
+        data = data[:, sorted_indices, :]
+        timestamps = timestamps[sorted_indices]
+        event_indices = event_indices[sorted_indices]
+        
+        kwargs["data"] = data
+        kwargs["event_timestamps"] = timestamps
+        kwargs["event_indices"] = event_indices
+        
 
         for key in kwargs:
             setattr(self, key, kwargs[key])
@@ -189,6 +208,13 @@ class AggregatedBinnedAlignedSpikes(NWBDataInterface):
         binned_spikes_for_unit = self.data[:, mask, :]
         
         return binned_spikes_for_unit
+    
+    def get_timestamps_for_stimuli(self, event_index):
+        
+        mask = self.event_indices == event_index
+        timestamps = self.event_timestamps[mask]
+        
+        return timestamps
 
 
 # Remove these functions from the package

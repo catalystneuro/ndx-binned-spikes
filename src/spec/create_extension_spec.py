@@ -117,7 +117,7 @@ def main():
         doc=(
             "A data interface for aggregated binned spike data aligned to multiple events "
             "(e.g. a stimuli or the beginning of a trial)."
-        ),        datasets=[aggregated_binned_aligned_spikes_data, event_indices, units_region],
+        ),        datasets=[aggregated_binned_aligned_spikes_data, event_indices, event_timestamps, units_region],
         attributes=[
             NWBAttributeSpec(
                 name="name",
