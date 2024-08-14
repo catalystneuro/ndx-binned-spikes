@@ -62,7 +62,7 @@ groups:
     doc: The name of this container
   - name: description
     dtype: text
-    value: Spikes data binned and aligned to event timestamps.
+    value: Spikes data binned and aligned to the timestamps of multiple events.
     doc: A description of what the data represents
   - name: bin_width_in_milliseconds
     dtype: float64

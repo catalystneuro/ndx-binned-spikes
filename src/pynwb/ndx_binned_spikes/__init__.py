@@ -1,5 +1,5 @@
 import os
-import numpy as np 
+import numpy as np
 from pynwb import load_namespaces, get_class
 from pynwb import register_class
 from pynwb.core import NWBDataInterface
@@ -32,7 +32,7 @@ class BinnedAlignedSpikes(NWBDataInterface):
         "milliseconds_from_event_to_first_bin",
         "data",
         "event_timestamps",
-        {"name":"units_region", "child":True},
+        {"name": "units_region", "child": True},
     )
 
     DEFAULT_NAME = "BinnedAlignedSpikes"
@@ -62,7 +62,7 @@ class BinnedAlignedSpikes(NWBDataInterface):
             "doc": (
                 "The time in milliseconds from the event to the beginning of the first bin. A negative value indicates"
                 "that the first bin is before the event whereas a positive value indicates that the first bin is "
-                "after the event." 
+                "after the event."
             ),
             "default": 0.0,
         },
@@ -97,12 +97,13 @@ class BinnedAlignedSpikes(NWBDataInterface):
             raise ValueError("The number of event timestamps must match the number of event repetitions in the data.")
 
         super().__init__(name=kwargs["name"])
-        
+
         name = kwargs.pop("name")
         super().__init__(name=name)
 
         for key in kwargs:
             setattr(self, key, kwargs[key])
+
 
 @register_class(neurodata_type="AggregatedBinnedAlignedSpikes", namespace="ndx-binned-spikes")  # noqa
 class AggregatedBinnedAlignedSpikes(NWBDataInterface):
@@ -112,13 +113,13 @@ class AggregatedBinnedAlignedSpikes(NWBDataInterface):
         "bin_width_in_milliseconds",
         "milliseconds_from_event_to_first_bin",
         "data",
-        "event_timestamps",
+        "timestamps",
         "event_indices",
-        {"name":"units_region", "child":True},  #TODO, I forgot why this is included
+        {"name": "units_region", "child": True},  # TODO, I forgot why this is included
     )
 
     DEFAULT_NAME = "AggregatedBinnedAlignedSpikes"
-    DEFAULT_DESCRIPTION = "Spikes data binned and aligned from multiple events."
+    DEFAULT_DESCRIPTION = "Spikes data binned and aligned to the timestamps of multiple events."
 
     @docval(
         {
@@ -144,7 +145,7 @@ class AggregatedBinnedAlignedSpikes(NWBDataInterface):
             "doc": (
                 "The time in milliseconds from the event to the beginning of the first bin. A negative value indicates"
                 "that the first bin is before the event whereas a positive value indicates that the first bin is "
-                "after the event." 
+                "after the event."
             ),
             "default": 0.0,
         },
@@ -181,7 +182,6 @@ class AggregatedBinnedAlignedSpikes(NWBDataInterface):
     )
     def __init__(self, **kwargs):
 
-        
         name = kwargs.pop("name")
         super().__init__(name=name)
 
@@ -189,34 +189,33 @@ class AggregatedBinnedAlignedSpikes(NWBDataInterface):
         timestamps = kwargs["timestamps"]
         event_indices = kwargs["event_indices"]
         data = kwargs["data"]
-        
+
         sorted_indices = np.argsort(timestamps)
         data = data[:, sorted_indices, :]
         timestamps = timestamps[sorted_indices]
         event_indices = event_indices[sorted_indices]
-        
+
         kwargs["data"] = data
         kwargs["timestamps"] = timestamps
         kwargs["event_indices"] = event_indices
-        
 
         for key in kwargs:
             setattr(self, key, kwargs[key])
-        
+
     # Should this return an instance of BinnedAlignedSpikes or just the data as it is?
     # Going with the simple one for the moment
     def get_data_for_stimuli(self, event_index):
-        
+
         mask = self.event_indices == event_index
         binned_spikes_for_unit = self.data[:, mask, :]
-        
+
         return binned_spikes_for_unit
-    
+
     def get_timestamps_for_stimuli(self, event_index):
-        
+
         mask = self.event_indices == event_index
         timestamps = self.timestamps[mask]
-        
+
         return timestamps
 
 

@@ -116,8 +116,7 @@ def main():
         dims=["number_of_events"],
     )
 
-    # TODO: This prbably can inherit from the simple class and then add the stimuli index.
-    # First, we need to figure out and discuss how to handle the timestamps of the events.
+    # TODO: This probably can inherit from the simple class and then add the stimuli index.
     aggregated_binned_aligned_spikes = NWBGroupSpec(
         neurodata_type_def="AggregatedBinnedAlignedSpikes",
         neurodata_type_inc="NWBDataInterface",
@@ -139,7 +138,7 @@ def main():
                 name="description",
                 doc="A description of what the data represents",
                 dtype="text",
-                value="Spikes data binned and aligned to event timestamps.",
+                value="Spikes data binned and aligned to the timestamps of multiple events.",
             ),
             NWBAttributeSpec(
                 name="bin_width_in_milliseconds",

@@ -1,7 +1,12 @@
 import numpy as np
 
-from pynwb.testing import TestCase
+from pynwb import NWBHDF5IO
+from pynwb.testing.mock.file import mock_NWBFile
+from pynwb.testing import TestCase, remove_test_file
+
 from ndx_binned_spikes import AggregatedBinnedAlignedSpikes
+from ndx_binned_spikes.testing.mock import mock_AggregatedBinnedAlignedSpikes, mock_Units
+from hdmf.common import DynamicTableRegion
 
 
 class TestAggregatedBinnedAlignedSpikesConstructor(TestCase):
@@ -100,18 +105,76 @@ class TestAggregatedBinnedAlignedSpikesConstructor(TestCase):
             data=self.data,
             timestamps=self.timestamps,
             event_indices=self.event_indices,
-            
         )
 
         data_for_stimuli_1 = aggregated_binnned_align_spikes.get_data_for_stimuli(event_index=0)
         np.testing.assert_allclose(data_for_stimuli_1, self.data_for_first_event)
-        
-        data_for_stimuli_2  = aggregated_binnned_align_spikes.get_data_for_stimuli(event_index=1)
+
+        data_for_stimuli_2 = aggregated_binnned_align_spikes.get_data_for_stimuli(event_index=1)
         np.testing.assert_allclose(data_for_stimuli_2, self.data_for_second_event)
 
         timestamps_stimuli_1 = aggregated_binnned_align_spikes.get_timestamps_for_stimuli(event_index=0)
         np.testing.assert_allclose(timestamps_stimuli_1, self.timestamps_first_event)
-        
+
         timestamps_stimuli_2 = aggregated_binnned_align_spikes.get_timestamps_for_stimuli(event_index=1)
         np.testing.assert_allclose(timestamps_stimuli_2, self.timestamps_second_event)
-        
+
+
+class TestAggregatedBinnedAlignedSpikesSimpleRoundtrip(TestCase):
+    """Simple roundtrip test for AggregatedBinnedAlignedSpikes."""
+
+    def setUp(self):
+        self.nwbfile = mock_NWBFile()
+
+        self.path = "test.nwb"
+
+    def tearDown(self):
+        remove_test_file(self.path)
+
+    def test_roundtrip_acquisition(self):
+
+        self.aggregated_binned_aligned_spikes = mock_AggregatedBinnedAlignedSpikes()
+
+        self.nwbfile.add_acquisition(self.aggregated_binned_aligned_spikes)
+
+        with NWBHDF5IO(self.path, mode="w") as io:
+            io.write(self.nwbfile)
+
+        with NWBHDF5IO(self.path, mode="r", load_namespaces=True) as io:
+            read_nwbfile = io.read()
+            read_container = read_nwbfile.acquisition["AggregatedBinnedAlignedSpikes"]
+            self.assertContainerEqual(self.aggregated_binned_aligned_spikes, read_container)
+
+    def test_roundtrip_processing_module(self):
+        self.aggregated_binned_aligned_spikes = mock_AggregatedBinnedAlignedSpikes()
+
+        ecephys_processinng_module = self.nwbfile.create_processing_module(name="ecephys", description="a description")
+        ecephys_processinng_module.add(self.aggregated_binned_aligned_spikes)
+
+        with NWBHDF5IO(self.path, mode="w") as io:
+            io.write(self.nwbfile)
+
+        with NWBHDF5IO(self.path, mode="r", load_namespaces=True) as io:
+            read_nwbfile = io.read()
+            read_container = read_nwbfile.processing["ecephys"]["AggregatedBinnedAlignedSpikes"]
+            self.assertContainerEqual(self.aggregated_binned_aligned_spikes, read_container)
+
+    def test_roundtrip_with_units_table(self):
+
+        units = mock_Units(num_units=3)
+        self.nwbfile.units = units
+        region_indices = [0, 3]
+        units_region = DynamicTableRegion(
+            data=region_indices, table=units, description="region of units table", name="units_region"
+        )
+
+        aggregated_binned_aligned_spikes_with_region = mock_AggregatedBinnedAlignedSpikes(units_region=units_region)
+        self.nwbfile.add_acquisition(aggregated_binned_aligned_spikes_with_region)
+
+        with NWBHDF5IO(self.path, mode="w") as io:
+            io.write(self.nwbfile)
+
+        with NWBHDF5IO(self.path, mode="r", load_namespaces=True) as io:
+            read_nwbfile = io.read()
+            read_container = read_nwbfile.acquisition["AggregatedBinnedAlignedSpikes"]
+            self.assertContainerEqual(aggregated_binned_aligned_spikes_with_region, read_container)
