@@ -180,7 +180,7 @@ binned_aligned_spikes = BinnedAlignedSpikes(
 As with the previous example this can be then added to a processing module in an NWB file and then written to disk using exactly the same code as before.
 
 ### Storing data from multiple conditions (i.e. multiple stimuli)
-`BinnedAlignedSpikes` can also be used to store data that is aggregated across multiple conditions while at the same time keeping track of which condition each set of counts corresponds to. This is useful when you want to store the spike counts around multiple conditions (e.g., different stimuli, behavioral events, etc.) in a single structure. For this purpose, the `BinnedAlignedSpikes` object is used. Since each condition may not occur the same number of times (e.g. different stimuli do not appear in the same frequency), an homogeneous data structure is not possible. Therefore an extra variable, `condition_indices`, is used to indicate which condition each set of counts corresponds to.
+`BinnedAlignedSpikes` can also be used to store data that is aggregated across multiple conditions while at the same time keeping track of which condition each set of counts corresponds to. This is useful when you want to store the spike counts around multiple conditions (e.g., different stimuli, behavioral events, etc.) in a single structure. Since each condition may not occur the same number of times (e.g. different stimuli do not appear in the same frequency), an homogeneous data structure is not possible. Therefore an extra variable, `condition_indices`, is used to indicate which condition each set of counts corresponds to.
 
 
 ```python
