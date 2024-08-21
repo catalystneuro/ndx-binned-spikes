@@ -7,7 +7,7 @@
    viewBox="0 0 457.02167 399.62019"
    version="1.1"
    id="svg16307"
-   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   inkscape:version="1.3.2 (1:1.3.2+202404261509+091e20ef0f)"
    sodipodi:docname="data.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -25,13 +25,13 @@
      inkscape:document-units="mm"
      showgrid="false"
      showguides="false"
-     inkscape:zoom="0.35355339"
-     inkscape:cx="-625.08239"
-     inkscape:cy="1156.8267"
-     inkscape:window-width="2490"
+     inkscape:zoom="0.5"
+     inkscape:cx="522"
+     inkscape:cy="885"
+     inkscape:window-width="2502"
      inkscape:window-height="1371"
-     inkscape:window-x="2630"
-     inkscape:window-y="192"
+     inkscape:window-x="2618"
+     inkscape:window-y="32"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1">
     <inkscape:grid
@@ -43,7 +43,8 @@
        spacingx="1"
        spacingy="1"
        originx="388.67175"
-       originy="460.23762" />
+       originy="460.23762"
+       visible="false" />
   </sodipodi:namedview>
   <defs
      id="defs16304" />
@@ -701,7 +702,7 @@
          style="stroke-width:1.28392"
          x="159.27605"
          y="130.45241"
-         id="tspan41133-2">event_timestamps = array([t<tspan
+         id="tspan41133-2">timestamps = array([t<tspan
    style="font-size:8.83225px;baseline-shift:sub;stroke-width:1.28392"
    id="tspan582">1</tspan>, t<tspan
    style="font-size:8.83225px;baseline-shift:sub;stroke-width:1.28392"
