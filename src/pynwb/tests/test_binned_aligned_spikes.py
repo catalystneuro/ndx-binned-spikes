@@ -35,7 +35,7 @@ class TestBinnedAlignedSpikesConstructor(TestCase):
             ),
         )
 
-        self.event_timestamps = np.arange(self.number_of_events, dtype="float64")
+        self.timestamps = np.arange(self.number_of_events, dtype="float64")
 
         self.nwbfile = mock_NWBFile()
 
@@ -46,11 +46,11 @@ class TestBinnedAlignedSpikesConstructor(TestCase):
             bin_width_in_milliseconds=self.bin_width_in_milliseconds,
             milliseconds_from_event_to_first_bin=self.milliseconds_from_event_to_first_bin,
             data=self.data,
-            event_timestamps=self.event_timestamps,
+            timestamps=self.timestamps,
         )
 
         np.testing.assert_array_equal(binned_aligned_spikes.data, self.data)
-        np.testing.assert_array_equal(binned_aligned_spikes.event_timestamps, self.event_timestamps)
+        np.testing.assert_array_equal(binned_aligned_spikes.timestamps, self.timestamps)
         self.assertEqual(binned_aligned_spikes.bin_width_in_milliseconds, self.bin_width_in_milliseconds)
         self.assertEqual(
             binned_aligned_spikes.milliseconds_from_event_to_first_bin, self.milliseconds_from_event_to_first_bin
@@ -87,7 +87,7 @@ class TestBinnedAlignedSpikesConstructor(TestCase):
             bin_width_in_milliseconds=self.bin_width_in_milliseconds,
             milliseconds_from_event_to_first_bin=self.milliseconds_from_event_to_first_bin,
             data=self.data,
-            event_timestamps=self.event_timestamps,
+            timestamps=self.timestamps,
             units_region=units_region,
         )
 
@@ -98,14 +98,14 @@ class TestBinnedAlignedSpikesConstructor(TestCase):
         self.assertListEqual(unit_table_names, expected_names)
 
     def test_constructor_inconsistent_timestamps_and_data_error(self):
-        shorter_timestamps = self.event_timestamps[:-1]
+        shorter_timestamps = self.timestamps[:-1]
         
         with self.assertRaises(ValueError):
             BinnedAlignedSpikes(
                 bin_width_in_milliseconds=self.bin_width_in_milliseconds,
                 milliseconds_from_event_to_first_bin=self.milliseconds_from_event_to_first_bin,
                 data=self.data,
-                event_timestamps=shorter_timestamps,
+                timestamps=shorter_timestamps,
             )
             
 
@@ -126,7 +126,9 @@ class TestBinnedAlignedSpikesSimpleRoundtrip(TestCase):
         Add a BinnedAlignedSpikes to an NWBFile, write it to file, read the file
         and test that the BinnedAlignedSpikes from the file matches the original BinnedAlignedSpikes.
         """
-        self.binned_aligned_spikes = mock_BinnedAlignedSpikes()
+        
+        # Testing here 
+        self.binned_aligned_spikes = mock_BinnedAlignedSpikes(number_of_conditions=0)
 
         self.nwbfile.add_acquisition(self.binned_aligned_spikes)
 

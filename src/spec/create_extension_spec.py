@@ -21,9 +21,7 @@ def main():
     )
     ns_builder.include_namespace("core")
 
-    # TODO: if your extension builds on another extension, include the namespace
-    # of the other extension below
-    # ns_builder.include_namespace("ndx-other-extension")
+
 
     binned_aligned_spikes_data = NWBDatasetSpec(
         name="data",
@@ -35,14 +33,6 @@ def main():
         shape=[None, None, None],
         dims=["num_units", "number_of_events", "number_of_bins"],
     )
-
-    event_timestamps = NWBDatasetSpec(
-        name="event_timestamps",
-        doc="The timestamps at which the events occurred.",
-        dtype="float64",
-        shape=[None],
-        dims=["number_of_events"],
-    )
     
     units_region = NWBDatasetSpec(
         name="units_region",
@@ -52,54 +42,6 @@ def main():
         
     )
     
-    binned_aligned_spikes = NWBGroupSpec(
-        neurodata_type_def="BinnedAlignedSpikes",
-        neurodata_type_inc="NWBDataInterface",
-        default_name="BinnedAlignedSpikes",
-        doc="A data interface for binned spike data aligned to an event (e.g. a stimuli or the beginning of a trial).",
-        datasets=[binned_aligned_spikes_data, event_timestamps, units_region],
-        attributes=[
-            NWBAttributeSpec(
-                name="name",
-                doc="The name of this container",
-                dtype="text",
-                value="BinnedAlignedSpikes",
-            ),
-            NWBAttributeSpec(
-                name="description",
-                doc="A description of what the data represents",
-                dtype="text",
-                value="Spikes data binned and aligned to event timestamps.",
-            ),
-            NWBAttributeSpec(
-                name="bin_width_in_milliseconds",
-                doc="The length in milliseconds of the bins",
-                dtype="float64",
-            ),
-            NWBAttributeSpec(
-                name="milliseconds_from_event_to_first_bin",
-                doc=(
-                "The time in milliseconds from the event to the beginning of the first bin. A negative value indicates"
-                "that the first bin is before the event whereas a positive value indicates that the first bin is "
-                "after the event." 
-                ),
-                dtype="float64",
-                default_value=0.0,
-            )
-        ],
-    )
-    
-    aggregated_binned_aligned_spikes_data = NWBDatasetSpec(
-        name="data",
-        doc=(
-            "The binned data. It should be an array whose first dimension is the number of units, the second dimension "
-            "is the total number of events of all stimuli, and the third dimension is the number of bins."
-            ),
-        dtype="numeric",  # TODO should this be a uint64?
-        shape=[None, None, None],
-        dims=["num_units", "number_of_events", "number_of_bins"],
-    )
-
     timestamps = NWBDatasetSpec(
         name="timestamps",
         doc="The timestamps at which the events occurred.",
@@ -108,25 +50,25 @@ def main():
         dims=["number_of_events"],
     )    
 
-    event_indices = NWBDatasetSpec(
-        name="event_indices",
-        doc="The index of the event that each row of the data corresponds to.",
-        dtype="int64",
+    condition_indices = NWBDatasetSpec(
+        name="condition_indices",
+        doc= (
+            "The index of the condition that each timestamps corresponds to "
+            "(e.g. a stimuli type, trial number, category, etc.)."
+            "This is only used when the data is aligned to multiple conditions"
+            ),
+        dtype="uint64",
         shape=[None],
         dims=["number_of_events"],
+        quantity="?",
     )
-
-    # TODO: This probably can inherit from the simple class and then add the stimuli index.
-    aggregated_binned_aligned_spikes = NWBGroupSpec(
-        neurodata_type_def="AggregatedBinnedAlignedSpikes",
+    
+    binned_aligned_spikes = NWBGroupSpec(
+        neurodata_type_def="BinnedAlignedSpikes",
         neurodata_type_inc="NWBDataInterface",
-        default_name="AggregatedBinnedAlignedSpikes",
-        doc=(
-            "A data interface for aggregated binned spike data aligned to multiple events. "
-            "The data for all the events is concatenated along the second dimension and a second array, "
-            "event_indices, is used to keep track of which event each row of the data corresponds to."
-        ),        
-        datasets=[aggregated_binned_aligned_spikes_data, event_indices, timestamps, units_region],
+        default_name="BinnedAlignedSpikes",
+        doc="A data interface for binned spike data aligned to an event (e.g. a stimuli or the beginning of a trial).",
+        datasets=[binned_aligned_spikes_data, timestamps, condition_indices, units_region],
         attributes=[
             NWBAttributeSpec(
                 name="name",
@@ -138,7 +80,7 @@ def main():
                 name="description",
                 doc="A description of what the data represents",
                 dtype="text",
-                value="Spikes data binned and aligned to the timestamps of multiple events.",
+                value="Spikes data binned and aligned to the timestamps of one or multiple conditions.",
             ),
             NWBAttributeSpec(
                 name="bin_width_in_milliseconds",
@@ -159,8 +101,7 @@ def main():
     )
     
 
-    # TODO: add all of your new data types to this list
-    new_data_types = [binned_aligned_spikes, aggregated_binned_aligned_spikes]
+    new_data_types = [binned_aligned_spikes]
 
     # export the spec to yaml files in the spec folder
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "spec"))
