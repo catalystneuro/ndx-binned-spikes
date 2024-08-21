@@ -147,7 +147,7 @@ class BinnedAlignedSpikes(NWBDataInterface):
 
         return binned_spikes_for_unit
 
-    def get_timestamps_for_stimuli(self, condition_index):
+    def get_timestamps_for_condition(self, condition_index):
 
         if not self.has_multiple_conditions:
             return self.timestamps
