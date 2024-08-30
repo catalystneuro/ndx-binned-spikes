@@ -158,10 +158,9 @@ class TestBinnedAlignedSpikesMultipleConditions(TestCase):
         self.timestamps_first_condition = [5.0, 15.0]
         self.timestamps_second_condition = [0.0, 10.0, 20.0]
 
-        
         data_list = [self.data_for_first_condition, self.data_for_second_condition]
         self.data = np.concatenate(data_list, axis=1)
-        
+
         indices_list = [np.full(data.shape[1], condition_index) for condition_index, data in enumerate(data_list)]
         self.condition_indices = np.concatenate(indices_list)
 
@@ -200,7 +199,9 @@ class TestBinnedAlignedSpikesMultipleConditions(TestCase):
         np.testing.assert_array_equal(
             aggregated_binnned_align_spikes.condition_indices, self.condition_indices[self.sorted_indices]
         )
-        np.testing.assert_array_equal(aggregated_binnned_align_spikes.event_timestamps, self.event_timestamps[self.sorted_indices])
+        np.testing.assert_array_equal(
+            aggregated_binnned_align_spikes.event_timestamps, self.event_timestamps[self.sorted_indices]
+        )
         self.assertEqual(aggregated_binnned_align_spikes.bin_width_in_milliseconds, self.bin_width_in_milliseconds)
         self.assertEqual(
             aggregated_binnned_align_spikes.milliseconds_from_event_to_first_bin,
