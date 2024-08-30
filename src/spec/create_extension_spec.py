@@ -54,7 +54,7 @@ def main():
         name="condition_indices",
         doc= (
             "The index of the condition that each timestamps corresponds to "
-            "(e.g. a stimuli type, trial number, category, etc.)."
+            "(e.g. a stimulus type, trial number, category, etc.)."
             "This is only used when the data is aligned to multiple conditions"
             ),
         dtype="uint64",
@@ -67,7 +67,7 @@ def main():
         neurodata_type_def="BinnedAlignedSpikes",
         neurodata_type_inc="NWBDataInterface",
         default_name="BinnedAlignedSpikes",
-        doc="A data interface for binned spike data aligned to an event (e.g. a stimuli or the beginning of a trial).",
+        doc="A data interface for binned spike data aligned to an event (e.g. a stimulus or the beginning of a trial).",
         datasets=[binned_aligned_spikes_data, event_timestamps, condition_indices, units_region],
         attributes=[
             NWBAttributeSpec(
@@ -80,7 +80,7 @@ def main():
                 name="description",
                 doc="A description of what the data represents",
                 dtype="text",
-                value="Spikes data binned and aligned to the timestamps of one or multiple conditions.",
+                value="Spikes data binned and aligned to the event timestamps of one or multiple conditions.",
             ),
             NWBAttributeSpec(
                 name="bin_width_in_milliseconds",

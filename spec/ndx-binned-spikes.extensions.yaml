@@ -50,7 +50,7 @@ groups:
     - number_of_events
     shape:
     - null
-    doc: The index of the condition that each timestamps corresponds to (e.g. a stimuli
+    doc: The index of the condition that each timestamps corresponds to (e.g. a stimulus
       type, trial number, category, etc.).This is only used when the data is aligned
       to multiple conditions
     quantity: '?'
