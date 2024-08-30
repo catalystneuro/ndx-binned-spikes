@@ -137,9 +137,7 @@ def mock_BinnedAlignedSpikes(
     if condition_indices is not None:
         number_of_conditions = np.unique(condition_indices).size
         
-        if condition_labels is None:
-            condition_labels = np.array([f"condition_{i}" for i in range(number_of_conditions)], dtype="U")
-        else:
+        if condition_labels is not None:
             condition_labels = np.asarray(condition_labels, dtype="U")
             
             if condition_labels.size != number_of_conditions:
