@@ -38,7 +38,7 @@ class BinnedAlignedSpikes(NWBDataInterface):
     )
 
     DEFAULT_NAME = "BinnedAlignedSpikes"
-    DEFAULT_DESCRIPTION = "Spikes data binned and aligned to the timestamps of one or multiple conditions."
+    DEFAULT_DESCRIPTION = "Spikes data binned and aligned to the event timestamps of one or multiple conditions."
 
     @docval(
         {
@@ -93,6 +93,17 @@ class BinnedAlignedSpikes(NWBDataInterface):
                 "The index of the condition that each entry of `event_timestamps` corresponds to "
                 "(e.g. a stimuli type, trial number, category, etc.)."
                 "This is only used when the data is aligned to multiple conditions"
+            ),
+            "shape": (None,),
+            "default": None,
+        },
+        {
+            "name":"condition_labels",
+            "type": "array_data",
+            "doc": (
+                "The labels of the conditions that the data is aligned to. The size of this array should match "
+                "the number of conditions. This is only used when the data is aligned to multiple conditions."
+                "First condition is index 0, second is index 1, etc."
             ),
             "shape": (None,),
             "default": None,

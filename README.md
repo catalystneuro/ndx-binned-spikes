@@ -192,12 +192,15 @@ binned_aligned_spikes = BinnedAlignedSpikes(
     data=data,  # Shape (number_of_units, number_of_events, number_of_bins)
     timestamps=timestamps,  # Shape (number_of_events,)
     condition_indices=condition_indices,  # Shape (number_of_events,)
+    condition_labels=condition_labels,  # Shape (number_of_conditions,) or np.unique(condition_indices).size
 )
 ```
 
 Note that `number_of_events` here represents the total number of repetitions for all the conditions being aggregated. For example, if data is being aggregated from two stimuli where the first stimulus appeared twice and the second appeared three times, the `number_of_events` would be 5.
 
 The `condition_indices` is an indicator vector that should be constructed so that `data[:, condition_indices == condition_index, :]` corresponds to the binned spike counts for the condition with the specified condition_index. You can retrieve the same data using the convenience method `binned_aligned_spikes.get_data_for_condition(condition_index)`.
+
+The `condition_labels` argument is optional and can be used to store the labels of the conditions. This is meant to help to understand the nature of the conditions
 
 It's important to note that the timestamps must be in ascending order and must correspond positionally to the condition indices and the second dimension of the data. If they are not, a ValueError will be raised. To help organize the data correctly, you can use the convenience method `BinnedAlignedSpikes.sort_data_by_event_timestamps(data=data, event_timestamps=event_timestamps, condition_indices=condition_indices)`, which ensures the data is properly sorted. Here’s how it can be used:
 
@@ -209,7 +212,8 @@ binned_aligned_spikes = BinnedAlignedSpikes(
     milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
     data=sorted_data,   
     event_timestamps=sorted_event_timestamps,  
-    condition_indices=sorted_condition_indices,  
+    condition_indices=sorted_condition_indices,
+    condition_labels=condition_labels
 )
 ```
 
@@ -278,6 +282,7 @@ milliseconds_from_event_to_first_bin = -50.0
 data = np.concatenate([data_for_first_stimuli, data_for_second_stimuli], axis=1)
 event_timestamps = np.concatenate([timestamps_first_stimuli, timestamps_second_stimuli])
 condition_indices = np.concatenate([np.zeros(2), np.ones(3)])
+condition_labels = ["a", "b"]
 
 sorted_data, sorted_event_timestamps, sorted_condition_indices = BinnedAlignedSpikes.sort_data_by_event_timestamps(data=data, event_timestamps=event_timestamps, condition_indices=condition_indices)
 

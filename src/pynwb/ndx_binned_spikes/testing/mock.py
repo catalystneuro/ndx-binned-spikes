@@ -6,6 +6,7 @@ from pynwb import NWBFile
 from pynwb.misc import Units
 from hdmf.common import DynamicTableRegion
 
+
 # TODO: Remove once pynwb 2.7.0 is released and use the mock class there
 def mock_Units(
     num_units: int = 10,
@@ -47,11 +48,12 @@ def mock_BinnedAlignedSpikes(
     event_timestamps: Optional[np.ndarray] = None,
     data: Optional[np.ndarray] = None,
     condition_indices: Optional[np.ndarray] = None,
+    condition_labels: Optional[np.ndarray] = None,
     units_region: Optional[DynamicTableRegion] = None,
     sort_data: bool = True,
 ) -> BinnedAlignedSpikes:
     """
-    Generate a mock BinnedAlignedSpikes object with specified parameters or from given data. 
+    Generate a mock BinnedAlignedSpikes object with specified parameters or from given data.
 
     Parameters
     ----------
@@ -77,11 +79,16 @@ def mock_BinnedAlignedSpikes(
         An array of event_timestamps for each event. If not provided, it will be automatically generated.
         It should have size `number_of_events`.
     condition_indices : np.ndarray, optional
-        An array of indices characterizing each condition. If not provided, it will be automatically generated.
+        An array of indices characterizing each condition. If not provided, it will be automatically generated
+        from the number of conditions and number of events. It should have size `number_of_events`.
+        If provided, the `number_of_conditions` parameter will be ignored and the number of conditions will be
+        inferred from the unique values in `condition_indices`.
+    condition_labels: np.ndarray, optional
+        An array of labels for each condition. It should have size `number_of_conditions`.
     units_region: DynamicTableRegion, optional
         A reference to the Units table region that contains the units of the data.
     sort_data: bool, optional
-        If True, the data will be sorted by timestamps. 
+        If True, the data will be sorted by timestamps.
     Returns
     -------
     BinnedAlignedSpikes
@@ -107,14 +114,13 @@ def mock_BinnedAlignedSpikes(
 
     if event_timestamps.shape[0] != number_of_events:
         raise ValueError("The shape of `event_timestamps` does not match `number_of_events`.")
-    
+
     if condition_indices is None and number_of_conditions > 0:
-        
-        
-        assert number_of_conditions < number_of_events, (
-            "The number of conditions should be less than the number of events."
-        )
-        
+
+        assert (
+            number_of_conditions < number_of_events
+        ), "The number of conditions should be less than the number of events."
+
         condition_indices = np.zeros(number_of_events, dtype=int)
         all_indices = np.arange(number_of_conditions, dtype=int)
 
@@ -126,12 +132,18 @@ def mock_BinnedAlignedSpikes(
             size=number_of_events - number_of_conditions,
             replace=True,
         )
+        
 
     if condition_indices is not None:
-        assert (
-            condition_indices.shape[0] == number_of_events
-        ), "The shape of `condition_indices` does not match `number_of_events`."
-        condition_indices = np.array(condition_indices, dtype=int)
+        number_of_conditions = np.unique(condition_indices).size
+        
+        if condition_labels is None:
+            condition_labels = np.array([f"condition_{i}" for i in range(number_of_conditions)], dtype="U")
+        else:
+            condition_labels = np.asarray(condition_labels, dtype="U")
+            
+            if condition_labels.size != number_of_conditions:
+                raise ValueError("The number of condition labels should match the number of conditions.")
 
     # Sort the data by timestamps
     if sort_data:
@@ -146,6 +158,7 @@ def mock_BinnedAlignedSpikes(
         data=data,
         event_timestamps=event_timestamps,
         condition_indices=condition_indices,
+        condition_labels=condition_labels,
         units_region=units_region,
     )
     return binned_aligned_spikes
