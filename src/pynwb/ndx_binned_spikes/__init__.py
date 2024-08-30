@@ -102,7 +102,7 @@ class BinnedAlignedSpikes(NWBDataInterface):
             "type": "array_data",
             "doc": (
                 "The labels of the conditions that the data is aligned to. The size of this array should match "
-                "the number of conditions. This is only used when the data is aligned to multiple conditions."
+                "the number of conditions. This is only used when the data is aligned to multiple conditions. "
                 "First condition is index 0, second is index 1, etc."
             ),
             "shape": (None,),
