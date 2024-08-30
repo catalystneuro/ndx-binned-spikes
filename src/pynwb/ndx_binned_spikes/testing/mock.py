@@ -44,7 +44,7 @@ def mock_BinnedAlignedSpikes(
     bin_width_in_milliseconds: float = 20.0,
     milliseconds_from_event_to_first_bin: float = 1.0,
     seed: int = 0,
-    timestamps: Optional[np.ndarray] = None,
+    event_timestamps: Optional[np.ndarray] = None,
     data: Optional[np.ndarray] = None,
     condition_indices: Optional[np.ndarray] = None,
     units_region: Optional[DynamicTableRegion] = None,
@@ -73,8 +73,8 @@ def mock_BinnedAlignedSpikes(
         A 3D array of shape (number_of_units, number_of_events, number_of_bins) representing
         the binned spike data. If provided, it overrides the generation of mock data based on other parameters.
         Its shape should match the expected number of units, event repetitions, and bins.
-    timestamps : np.ndarray, optional
-        An array of timestamps for each event. If not provided, it will be automatically generated.
+    event_timestamps : np.ndarray, optional
+        An array of event_timestamps for each event. If not provided, it will be automatically generated.
         It should have size `number_of_events`.
     condition_indices : np.ndarray, optional
         An array of indices characterizing each condition. If not provided, it will be automatically generated.
@@ -102,11 +102,11 @@ def mock_BinnedAlignedSpikes(
     )
     assert data.shape == (number_of_units, number_of_events, number_of_bins), assertion_msg
 
-    if timestamps is None:
-        timestamps = np.arange(number_of_events, dtype="float64")
+    if event_timestamps is None:
+        event_timestamps = np.arange(number_of_events, dtype="float64")
 
-    if timestamps.shape[0] != number_of_events:
-        raise ValueError("The shape of `timestamps` does not match `number_of_events`.")
+    if event_timestamps.shape[0] != number_of_events:
+        raise ValueError("The shape of `event_timestamps` does not match `number_of_events`.")
     
     if condition_indices is None and number_of_conditions > 0:
         
@@ -135,7 +135,7 @@ def mock_BinnedAlignedSpikes(
 
     # Sort the data by timestamps
     if sort_data:
-        sorted_indices = np.argsort(timestamps)
+        sorted_indices = np.argsort(event_timestamps)
         data = data[:, sorted_indices, :]
         if condition_indices is not None:
             condition_indices = condition_indices[sorted_indices]
@@ -144,7 +144,7 @@ def mock_BinnedAlignedSpikes(
         bin_width_in_milliseconds=bin_width_in_milliseconds,
         milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
         data=data,
-        timestamps=timestamps,
+        event_timestamps=event_timestamps,
         condition_indices=condition_indices,
         units_region=units_region,
     )

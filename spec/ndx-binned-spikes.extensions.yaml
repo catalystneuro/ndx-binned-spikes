@@ -37,7 +37,7 @@ groups:
     doc: The binned data. It should be an array whose first dimension is the number
       of units, the second dimension is the number of events, and the third dimension
       is the number of bins.
-  - name: timestamps
+  - name: event_timestamps
     dtype: float64
     dims:
     - number_of_events

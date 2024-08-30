@@ -78,7 +78,7 @@ class BinnedAlignedSpikes(NWBDataInterface):
             ),
         },
         {
-            "name": "timestamps",
+            "name": "event_timestamps",
             "type": "array_data",
             "doc": (
                 "The timestamps at which the events occurred. It is assumed that they map positionally to "
@@ -90,7 +90,7 @@ class BinnedAlignedSpikes(NWBDataInterface):
             "name": "condition_indices",
             "type": "array_data",
             "doc": (
-                "The index of the condition that each timestamps corresponds to "
+                "The index of the condition that each entry of `event_timestamps` corresponds to "
                 "(e.g. a stimuli type, trial number, category, etc.)."
                 "This is only used when the data is aligned to multiple conditions"
             ),
@@ -109,20 +109,23 @@ class BinnedAlignedSpikes(NWBDataInterface):
         name = kwargs.pop("name")
         super().__init__(name=name)
 
-        timestamps = kwargs["timestamps"]
+        event_timestamps = kwargs["event_timestamps"]
         data = kwargs["data"]
 
-        if data.shape[1] != timestamps.shape[0]:
-            raise ValueError(
-                f"The number of timestamps {timestamps.shape[0]} must match the second axis of data {data.shape[1]}."
+        if data.shape[1] != event_timestamps.shape[0]:
+            msg = (
+                f"The number of event_timestamps must match the second axis of data: \n"
+                f"event_timestamps.size: {event_timestamps.size} \n" 
+                f"data.shape[1]: {data.shape[1]}"
             )
+            raise ValueError(msg)
 
         # Assert timestamps are monotonically increasing
-        if not np.all(np.diff(kwargs["timestamps"]) >= 0):
+        if not np.all(np.diff(kwargs["event_timestamps"]) >= 0):
             error_msg = (
-                "The timestamps must be monotonically increasing and the data and condition_indices "
-                "must be sorted by timestamps. Use the `BinnedAlignedSpikes.sort_data_by_timestamps` method to do this "
-                "automatically before initializing `BinnedAlignedSpikes`."
+                "The event_timestamps must be monotonically increasing and the data and condition_indices "
+                "must be sorted by event_timestamps. Use the `BinnedAlignedSpikes.sort_data_by_timestamps` "
+                "method to do this automatically before initializing `BinnedAlignedSpikes`."
             )
             raise ValueError(error_msg)
 
@@ -131,8 +134,8 @@ class BinnedAlignedSpikes(NWBDataInterface):
         self.has_multiple_conditions = condition_indices is not None
         if self.has_multiple_conditions:
             assert (
-                condition_indices.shape[0] == timestamps.shape[0]
-            ), "The number of timestamps must match the condition_indices."
+                condition_indices.shape[0] == event_timestamps.shape[0]
+            ), "The number of event_timestamps must match the condition_indices."
 
         for key in kwargs:
             setattr(self, key, kwargs[key])
@@ -147,29 +150,29 @@ class BinnedAlignedSpikes(NWBDataInterface):
 
         return binned_spikes_for_unit
 
-    def get_timestamps_for_condition(self, condition_index):
+    def get_event_timestamps_for_condition(self, condition_index):
 
         if not self.has_multiple_conditions:
-            return self.timestamps
+            return self.event_timestamps
 
         mask = self.condition_indices == condition_index
-        timestamps = self.timestamps[mask]
+        event_timestamps = self.event_timestamps[mask]
 
-        return timestamps
+        return event_timestamps
 
     @staticmethod
-    def sort_data_by_timestamps(
+    def sort_data_by_event_timestamps(
         data: np.ndarray,
-        timestamps: np.ndarray,
+        event_timestamps: np.ndarray,
         condition_indices: np.ndarray,
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
 
-        sorted_indices = np.argsort(timestamps)
+        sorted_indices = np.argsort(event_timestamps)
         data = data[:, sorted_indices, :]
-        timestamps = timestamps[sorted_indices]
+        event_timestamps = event_timestamps[sorted_indices]
         condition_indices = condition_indices[sorted_indices]
 
-        return data, timestamps, condition_indices
+        return data, event_timestamps, condition_indices
 
 
 # Remove these functions from the package

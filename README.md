@@ -41,12 +41,12 @@ data = np.array(
     ],
 )
 
-timestamps = np.array([0.25, 5.0, 12.25])  # The timestamps to which we align the counts
+event_timestamps = np.array([0.25, 5.0, 12.25])  # The timestamps to which we align the counts
 milliseconds_from_event_to_first_bin = -50.0  # The first bin is 50 ms before the event
 bin_width_in_milliseconds = 100.0  # Each bin is 100 ms wide
 binned_aligned_spikes = BinnedAlignedSpikes(
     data=data,
-    timestamps=timestamps,
+    event_timestamps=event_timestamps,
     bin_width_in_milliseconds=bin_width_in_milliseconds,
     milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin
 )
@@ -95,7 +95,7 @@ Note that in the diagram above, the `milliseconds_from_event_to_first_bin` is ne
 The `data` argument passed to the `BinnedAlignedSpikes` stores counts across all the event timestamps for each of the units. The data is a 3D array where the first dimension indexes the units, the second dimension indexes the event timestamps, and the third dimension indexes the bins where the counts are stored. The shape of the data is  `(number_of_units`, `number_of_events`, `number_of_bins`). 
 
 
-The `timestamps` is used to store the timestamps of the events and should have the same length as the second dimension of `data`. Note that the timestamps should not decrease or in other words the events are expected to be in ascending order in time.
+The `event_timestamps` argument is used to store the timestamps of the events and should have the same length as the second dimension of `data`. Note that the event_timestamps should not decrease or in other words the events are expected to be in ascending order in time.
 
 The first dimension of `data` works almost like a dictionary. That is, you select a specific unit by indexing the first dimension. For example, `data[0]` would return the data of the first unit. For each of the units, the data is organized with the time on the first axis as this is the convention in the NWB format. As a consequence of this choice the data of each unit is contiguous in memory.
 
@@ -106,7 +106,7 @@ The following diagram illustrates the structure of the data for a concrete examp
 
 
 ### Linking to units table
-One way to make the information stored in the `BinnedAlignedSpikes` object more useful is to indicate exactly which units or neurons the first dimension of the `data` attribute corresponds to. This is **optional but recommended** as it makes the data more interpretable and useful for future users. In NWB the units are usually stored in a `Units` [table](https://pynwb.readthedocs.io/en/stable/pynwb.misc.html#pynwb.misc.Units). To illustrate how to to create this link let's first create a toy `Units` table:
+One way to make the information stored in the `BinnedAlignedSpikes` object more useful for future users is to indicate exactly which units or neurons the first dimension of the `data` attribute corresponds to. This is **optional but recommended** as it makes the data more meaningfull and easier to interpret. In NWB the units are usually stored in a `Units` [table](https://pynwb.readthedocs.io/en/stable/pynwb.misc.html#pynwb.misc.Units). To illustrate how to to create this link let's first create a toy `Units` table:
 
 ```python
 import numpy as np
@@ -160,14 +160,14 @@ units_region = DynamicTableRegion(
     data=region_indices, table=units_table, description="region of units table", name="units_region"
 )
 
-timestamps = np.array([0.25, 5.0, 12.25])
+event_timestamps = np.array([0.25, 5.0, 12.25])
 milliseconds_from_event_to_first_bin = -50.0  # The first bin is 50 ms before the event
 bin_width_in_milliseconds = 100.0
 name = "BinnedAignedSpikesForMyPurpose"
 description = "Spike counts that is binned and aligned to events."
 binned_aligned_spikes = BinnedAlignedSpikes(
     data=data,
-    timestamps=timestamps,
+    event_timestamps=event_timestamps,
     bin_width_in_milliseconds=bin_width_in_milliseconds,
     milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
     description=description,
@@ -199,16 +199,16 @@ Note that `number_of_events` here represents the total number of repetitions for
 
 The `condition_indices` is an indicator vector that should be constructed so that `data[:, condition_indices == condition_index, :]` corresponds to the binned spike counts for the condition with the specified condition_index. You can retrieve the same data using the convenience method `binned_aligned_spikes.get_data_for_condition(condition_index)`.
 
-It's important to note that the timestamps must be in ascending order and must correspond positionally to the condition indices and the second dimension of the data. If they are not, a ValueError will be raised. To help organize the data correctly, you can use the convenience method `BinnedAlignedSpikes.sort_data_by_timestamps(data=data, timestamps=timestamps, condition_indices=condition_indices)`, which ensures the data is properly sorted. Here’s how it can be used:
+It's important to note that the timestamps must be in ascending order and must correspond positionally to the condition indices and the second dimension of the data. If they are not, a ValueError will be raised. To help organize the data correctly, you can use the convenience method `BinnedAlignedSpikes.sort_data_by_event_timestamps(data=data, event_timestamps=event_timestamps, condition_indices=condition_indices)`, which ensures the data is properly sorted. Here’s how it can be used:
 
 ```python
-sorted_data, sorted_timestamps, sorted_condition_indices = BinnedAlignedSpikes.sort_data_by_timestamps(data=data, timestamps=timestamps, condition_indices=condition_indices)
+sorted_data, sorted_event_timestamps, sorted_condition_indices = BinnedAlignedSpikes.sort_data_by_event_timestamps(data=data, event_timestamps=event_timestamps, condition_indices=condition_indices)
 
 binned_aligned_spikes = BinnedAlignedSpikes(
     bin_width_in_milliseconds=bin_width_in_milliseconds,
     milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
     data=sorted_data,   
-    timestamps=sorted_timestamps,  
+    event_timestamps=sorted_event_timestamps,  
     condition_indices=sorted_condition_indices,  
 )
 ```
@@ -216,9 +216,9 @@ binned_aligned_spikes = BinnedAlignedSpikes(
 The same can be achieved by using the following script:
 
 ```python
-sorted_indices = np.argsort(timestamps)
+sorted_indices = np.argsort(event_timestamps)
 sorted_data = data[:, sorted_indices, :]
-sorted_timestamps = timestamps[sorted_indices]
+sorted_event_timestamps = event_timestamps[sorted_indices]
 sorted_condition_indices = condition_indices[sorted_indices]
 ```
 
@@ -276,16 +276,16 @@ bin_width_in_milliseconds = 100.0
 milliseconds_from_event_to_first_bin = -50.0
 
 data = np.concatenate([data_for_first_stimuli, data_for_second_stimuli], axis=1)
-timestamps = np.concatenate([timestamps_first_stimuli, timestamps_second_stimuli])
+event_timestamps = np.concatenate([timestamps_first_stimuli, timestamps_second_stimuli])
 condition_indices = np.concatenate([np.zeros(2), np.ones(3)])
 
-sorted_data, sorted_timestamps, sorted_condition_indices = BinnedAlignedSpikes.sort_data_by_timestamps(data=data, timestamps=timestamps, condition_indices=condition_indices)
+sorted_data, sorted_event_timestamps, sorted_condition_indices = BinnedAlignedSpikes.sort_data_by_event_timestamps(data=data, event_timestamps=event_timestamps, condition_indices=condition_indices)
 
 binned_aligned_spikes = BinnedAlignedSpikes(
     bin_width_in_milliseconds=bin_width_in_milliseconds,
     milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
     data=sorted_data,   
-    timestamps=sorted_timestamps,  
+    event_timestamps=sorted_event_timestamps,  
     condition_indices=sorted_condition_indices,  
 )
 ```

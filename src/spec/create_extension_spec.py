@@ -42,8 +42,8 @@ def main():
         
     )
     
-    timestamps = NWBDatasetSpec(
-        name="timestamps",
+    event_timestamps = NWBDatasetSpec(
+        name="event_timestamps",
         doc="The timestamps at which the events occurred.",
         dtype="float64",
         shape=[None],
@@ -68,7 +68,7 @@ def main():
         neurodata_type_inc="NWBDataInterface",
         default_name="BinnedAlignedSpikes",
         doc="A data interface for binned spike data aligned to an event (e.g. a stimuli or the beginning of a trial).",
-        datasets=[binned_aligned_spikes_data, timestamps, condition_indices, units_region],
+        datasets=[binned_aligned_spikes_data, event_timestamps, condition_indices, units_region],
         attributes=[
             NWBAttributeSpec(
                 name="name",
