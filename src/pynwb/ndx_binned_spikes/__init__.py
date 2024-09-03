@@ -32,12 +32,13 @@ class BinnedAlignedSpikes(NWBDataInterface):
         "bin_width_in_milliseconds",
         "milliseconds_from_event_to_first_bin",
         "data",
-        "event_timestamps",
-        {"name": "units_region", "child": True},
+        "timestamps",
+        "condition_indices",
+        {"name": "units_region", "child": True},  # TODO, I forgot why this is included
     )
 
     DEFAULT_NAME = "BinnedAlignedSpikes"
-    DEFAULT_DESCRIPTION = "Spikes data binned and aligned to event timestamps."
+    DEFAULT_DESCRIPTION = "Spikes data binned and aligned to the event timestamps of one or multiple conditions."
 
     @docval(
         {
@@ -79,89 +80,6 @@ class BinnedAlignedSpikes(NWBDataInterface):
         {
             "name": "event_timestamps",
             "type": "array_data",
-            "doc": "The timestamps at which the events occurred.",
-            "shape": (None,),
-        },
-        {
-            "name": "units_region",
-            "type": DynamicTableRegion,
-            "doc": "A reference to the Units table region that contains the units of the data.",
-            "default": None,
-        },
-    )
-    def __init__(self, **kwargs):
-
-        data = kwargs["data"]
-        event_timestamps = kwargs["event_timestamps"]
-
-        if data.shape[1] != event_timestamps.shape[0]:
-            raise ValueError("The number of event timestamps must match the number of event repetitions in the data.")
-
-        super().__init__(name=kwargs["name"])
-
-        name = kwargs.pop("name")
-        super().__init__(name=name)
-
-        for key in kwargs:
-            setattr(self, key, kwargs[key])
-
-
-@register_class(neurodata_type="AggregatedBinnedAlignedSpikes", namespace="ndx-binned-spikes")  # noqa
-class AggregatedBinnedAlignedSpikes(NWBDataInterface):
-    __nwbfields__ = (
-        "name",
-        "description",
-        "bin_width_in_milliseconds",
-        "milliseconds_from_event_to_first_bin",
-        "data",
-        "timestamps",
-        "event_indices",
-        {"name": "units_region", "child": True},  # TODO, I forgot why this is included
-    )
-
-    DEFAULT_NAME = "AggregatedBinnedAlignedSpikes"
-    DEFAULT_DESCRIPTION = "Spikes data binned and aligned to the timestamps of multiple events."
-
-    @docval(
-        {
-            "name": "name",
-            "type": str,
-            "doc": "The name of this container",
-            "default": DEFAULT_NAME,
-        },
-        {
-            "name": "description",
-            "type": str,
-            "doc": "A description of what the data represents",
-            "default": DEFAULT_DESCRIPTION,
-        },
-        {
-            "name": "bin_width_in_milliseconds",
-            "type": float,
-            "doc": "The length in milliseconds of the bins",
-        },
-        {
-            "name": "milliseconds_from_event_to_first_bin",
-            "type": float,
-            "doc": (
-                "The time in milliseconds from the event to the beginning of the first bin. A negative value indicates"
-                "that the first bin is before the event whereas a positive value indicates that the first bin is "
-                "after the event."
-            ),
-            "default": 0.0,
-        },
-        {
-            "name": "data",
-            "type": "array_data",
-            "shape": [(None, None, None)],
-            "doc": (
-                "The binned data. It should be an array whose first dimension is the number of units, "
-                "the second dimension is the number of events, and the third dimension is the number of bins."
-            ),
-        },
-        {
-            "name": "timestamps",
-            "type": "array_data",
             "doc": (
                 "The timestamps at which the events occurred. It is assumed that they map positionally to "
                 "the second index of the data.",
@@ -169,10 +87,26 @@ class AggregatedBinnedAlignedSpikes(NWBDataInterface):
             "shape": (None,),
         },
         {
-            "name": "event_indices",
+            "name": "condition_indices",
             "type": "array_data",
-            "doc": "The timestamps at which the events occurred.",
+            "doc": (
+                "The index of the condition that each entry of `event_timestamps` corresponds to "
+                "(e.g. a stimuli type, trial number, category, etc.)."
+                "This is only used when the data is aligned to multiple conditions"
+            ),
             "shape": (None,),
+            "default": None,
+        },
+        {
+            "name":"condition_labels",
+            "type": "array_data",
+            "doc": (
+                "The labels of the conditions that the data is aligned to. The size of this array should match "
+                "the number of conditions. This is only used when the data is aligned to multiple conditions. "
+                "First condition is index 0, second is index 1, etc."
+            ),
+            "shape": (None,),
+            "default": None,
         },
         {
             "name": "units_region",
@@ -186,54 +120,70 @@ class AggregatedBinnedAlignedSpikes(NWBDataInterface):
         name = kwargs.pop("name")
         super().__init__(name=name)
 
-        timestamps = kwargs["timestamps"]
-        event_indices = kwargs["event_indices"]
+        event_timestamps = kwargs["event_timestamps"]
         data = kwargs["data"]
 
-        assert data.shape[1] == timestamps.shape[0], "The number of timestamps must match the second axis of data."
-        assert event_indices.shape[0] == timestamps.shape[0], "The number of timestamps must match the event_indices."
+        if data.shape[1] != event_timestamps.shape[0]:
+            msg = (
+                f"The number of event_timestamps must match the second axis of data: \n"
+                f"event_timestamps.size: {event_timestamps.size} \n" 
+                f"data.shape[1]: {data.shape[1]}"
+            )
+            raise ValueError(msg)
 
         # Assert timestamps are monotonically increasing
-        if not np.all(np.diff(kwargs["timestamps"]) >= 0):
+        if not np.all(np.diff(kwargs["event_timestamps"]) >= 0):
             error_msg = (
-                "The timestamps must be monotonically increasing and the data and event_indices "
-                "must be sorted by timestamps. Use the `sort_data_by_timestamps` method to do this "
-                "automatically before passing the data to the constructor."
+                "The event_timestamps must be monotonically increasing and the data and condition_indices "
+                "must be sorted by event_timestamps. Use the `BinnedAlignedSpikes.sort_data_by_timestamps` "
+                "method to do this automatically before initializing `BinnedAlignedSpikes`."
             )
             raise ValueError(error_msg)
+
+        # Condition indices check
+        condition_indices = kwargs.get("condition_indices", None)
+        self.has_multiple_conditions = condition_indices is not None
+        if self.has_multiple_conditions:
+            assert (
+                condition_indices.shape[0] == event_timestamps.shape[0]
+            ), "The number of event_timestamps must match the condition_indices."
 
         for key in kwargs:
             setattr(self, key, kwargs[key])
 
-    # Should this return an instance of BinnedAlignedSpikes or just the data as it is?
-    # Going with the simple one for the moment
-    def get_data_for_stimuli(self, event_index):
+    def get_data_for_condition(self, condition_index):
 
-        mask = self.event_indices == event_index
+        if not self.has_multiple_conditions:
+            return self.data
+
+        mask = self.condition_indices == condition_index
         binned_spikes_for_unit = self.data[:, mask, :]
 
         return binned_spikes_for_unit
 
-    def get_timestamps_for_stimuli(self, event_index):
+    def get_event_timestamps_for_condition(self, condition_index):
 
-        mask = self.event_indices == event_index
-        timestamps = self.timestamps[mask]
+        if not self.has_multiple_conditions:
+            return self.event_timestamps
 
-        return timestamps
+        mask = self.condition_indices == condition_index
+        event_timestamps = self.event_timestamps[mask]
+
+        return event_timestamps
 
     @staticmethod
-    def sort_data_by_timestamps(
+    def sort_data_by_event_timestamps(
         data: np.ndarray,
-        timestamps: np.ndarray,
-        event_indices: np.ndarray,
+        event_timestamps: np.ndarray,
+        condition_indices: np.ndarray,
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
 
-        sorted_indices = np.argsort(timestamps)
+        sorted_indices = np.argsort(event_timestamps)
         data = data[:, sorted_indices, :]
-        timestamps = timestamps[sorted_indices]
-        event_indices = event_indices[sorted_indices]
+        event_timestamps = event_timestamps[sorted_indices]
+        condition_indices = condition_indices[sorted_indices]
 
-        return data, timestamps, event_indices
+        return data, event_timestamps, condition_indices
 
 
 # Remove these functions from the package

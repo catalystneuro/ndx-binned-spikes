@@ -60,7 +60,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from pynwb import NWBHDF5IO, NWBFile
 
-session_description = "A session of data where PSTH was produced"
+session_description = "A session of data where a PSTH structure was produced"
 session_start_time = datetime.now(ZoneInfo("Asia/Ulaanbaatar"))
 identifier = "a_session_identifier"
 nwbfile = NWBFile(
@@ -95,7 +95,7 @@ Note that in the diagram above, the `milliseconds_from_event_to_first_bin` is ne
 The `data` argument passed to the `BinnedAlignedSpikes` stores counts across all the event timestamps for each of the units. The data is a 3D array where the first dimension indexes the units, the second dimension indexes the event timestamps, and the third dimension indexes the bins where the counts are stored. The shape of the data is  `(number_of_units`, `number_of_events`, `number_of_bins`). 
 
 
-The `event_timestamps` is used to store the timestamps of the events and should have the same length as the second dimension of `data`.
+The `event_timestamps` argument is used to store the timestamps of the events and should have the same length as the second dimension of `data`. Note that the event_timestamps should not decrease or in other words the events are expected to be in ascending order in time.
 
 The first dimension of `data` works almost like a dictionary. That is, you select a specific unit by indexing the first dimension. For example, `data[0]` would return the data of the first unit. For each of the units, the data is organized with the time on the first axis as this is the convention in the NWB format. As a consequence of this choice the data of each unit is contiguous in memory.
 
@@ -106,7 +106,7 @@ The following diagram illustrates the structure of the data for a concrete examp
 
 
 ### Linking to units table
-One way to make the information stored in the `BinnedAlignedSpikes` object more useful is to indicate exactly which units or neurons the first dimension of the `data` attribute corresponds to. This is **optional but recommended** as it makes the data more interpretable and useful for future users. In NWB the units are usually stored in a `Units` [table](https://pynwb.readthedocs.io/en/stable/pynwb.misc.html#pynwb.misc.Units). To illustrate how to to create this link let's first create a toy `Units` table:
+One way to make the information stored in the `BinnedAlignedSpikes` object more useful for future users is to indicate exactly which units or neurons the first dimension of the `data` attribute corresponds to. This is **optional but recommended** as it makes the data more meaningful and easier to interpret. In NWB the units are usually stored in a `Units` [table](https://pynwb.readthedocs.io/en/stable/pynwb.misc.html#pynwb.misc.Units). To illustrate how to to create this link let's first create a toy `Units` table:
 
 ```python
 import numpy as np
@@ -177,70 +177,64 @@ binned_aligned_spikes = BinnedAlignedSpikes(
 
 ```
 
-As with the previous example this can be then added to a processing module in an NWB file and written to disk using exactly the same code as before.
+As with the previous example this can be then added to a processing module in an NWB file and then written to disk using exactly the same code as before.
 
-### Storing data from multiple events together
-In experiments where multiple stimuli are presented to a subject within a single session, it is often useful to store the aggregated spike counts from all events in a single object. For such cases, the `AggregatedBinnedAlignedSpikes` object is ideal. This object functions similarly to the `BinnedAlignedSpikes` object but is designed to store data from multiple events (e.g., different stimuli) together.
-
-Since events may not occur the same number of times, an homogeneous data structure is not possible. Therefore the `AggregatedBinnedAlignedSpikes` object includes an additional variable, event_indices, to indicate which event each set of counts corresponds to. You can create this object as follows:
+### Storing data from multiple conditions (i.e. multiple stimuli)
+`BinnedAlignedSpikes` can also be used to store data that is aggregated across multiple conditions while at the same time keeping track of which condition each set of counts corresponds to. This is useful when you want to store the spike counts around multiple conditions (e.g., different stimuli, behavioral events, etc.) in a single structure. Since each condition may not occur the same number of times (e.g. different stimuli do not appear in the same frequency), an homogeneous data structure is not possible. Therefore an extra variable, `condition_indices`, is used to indicate which condition each set of counts corresponds to.
 
 
 ```python
-from ndx_binned_spikes import AggregatedBinnedAlignedSpikes
+from ndx_binned_spikes import BinnedAlignedSpikes
 
-aggregated_binned_aligned_spikes = AggregatedBinnedAlignedSpikes(
+binned_aligned_spikes = BinnedAlignedSpikes(
     bin_width_in_milliseconds=bin_width_in_milliseconds,
     milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
-    data=data,  # Shape (number_of_units, aggregated_events_counts, number_of_bins)
-    timestamps=timestamps,  # As many timestamps as the second dimension of data
-    event_indices=event_indices,  # An index indicating which event each of the counts corresponds to
+    data=data,  # Shape (number_of_units, number_of_events, number_of_bins)
+    timestamps=timestamps,  # Shape (number_of_events,)
+    condition_indices=condition_indices,  # Shape (number_of_events,)
+    condition_labels=condition_labels,  # Shape (number_of_conditions,) or np.unique(condition_indices).size
 )
 ```
 
-The `aggregated_events_counts` represents the total number of repetitions for all the events being aggregated. For example, if data is being aggregated from two stimuli where the first stimulus appeared twice and the second appeared three times, the aggregated_events_counts would be 5.
+Note that `number_of_events` here represents the total number of repetitions for all the conditions being aggregated. For example, if data is being aggregated from two stimuli where the first stimulus appeared twice and the second appeared three times, the `number_of_events` would be 5.
 
-The `event_indices` is an indicator vector that should be constructed so that `data[:, event_indices == event_index, :]` corresponds to the binned spike counts around the event with the specified event_index. You can retrieve the same data using the convenience method `aggregated_binned_aligned_spikes.get_data_for_event(event_index)`.
+The `condition_indices` is an indicator vector that should be constructed so that `data[:, condition_indices == condition_index, :]` corresponds to the binned spike counts for the condition with the specified condition_index. You can retrieve the same data using the convenience method `binned_aligned_spikes.get_data_for_condition(condition_index)`.
 
-It's important to note that the timestamps must be in ascending order and must correspond positionally to the event indices and the second dimension of the data. If they are not, a ValueError will be raised. To help organize the data correctly, you can use the convenience method `AggregatedBinnedAlignedSpikes.sort_data_by_timestamps(data=data, timestamps=timestamps, event_indices=event_indices)`, which ensures the data is properly sorted. Here’s how it can be used:
+The `condition_labels` argument is optional and can be used to store the labels of the conditions. This is meant to help to understand the nature of the conditions
+
+It's important to note that the timestamps must be in ascending order and must correspond positionally to the condition indices and the second dimension of the data. If they are not, a ValueError will be raised. To help organize the data correctly, you can use the convenience method `BinnedAlignedSpikes.sort_data_by_event_timestamps(data=data, event_timestamps=event_timestamps, condition_indices=condition_indices)`, which ensures the data is properly sorted. Here’s how it can be used:
 
 ```python
-sorted_data, sorted_timestamps, sorted_event_indices = AggregatedBinnedAlignedSpikes.sort_data_by_timestamps(data=data, timestamps=timestamps, event_indices=event_indices)
+sorted_data, sorted_event_timestamps, sorted_condition_indices = BinnedAlignedSpikes.sort_data_by_event_timestamps(data=data, event_timestamps=event_timestamps, condition_indices=condition_indices)
 
-aggregated_binned_aligned_spikes = AggregatedBinnedAlignedSpikes(
+binned_aligned_spikes = BinnedAlignedSpikes(
     bin_width_in_milliseconds=bin_width_in_milliseconds,
     milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
     data=sorted_data,   
-    timestamps=sorted_timestamps,  
-    event_indices=sorted_event_indices,  
+    event_timestamps=sorted_event_timestamps,  
+    condition_indices=sorted_condition_indices,
+    condition_labels=condition_labels
 )
 ```
 
 The same can be achieved by using the following script:
 
 ```python
-sorted_indices = np.argsort(timestamps)
+sorted_indices = np.argsort(event_timestamps)
 sorted_data = data[:, sorted_indices, :]
-sorted_timestamps = timestamps[sorted_indices]
-sorted_event_indices = event_indices[sorted_indices]
-
-aggregated_binned_aligned_spikes = AggregatedBinnedAlignedSpikes(
-    bin_width_in_milliseconds=bin_width_in_milliseconds,
-    milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
-    data=sorted_data,   
-    timestamps=sorted_timestamps,  
-    event_indices=sorted_event_indices,  
-)
+sorted_event_timestamps = event_timestamps[sorted_indices]
+sorted_condition_indices = condition_indices[sorted_indices]
 ```
 
-#### Example of building an `AggregatedBinnedAlignedSpikes` object from scratch
+#### Example of building an `BinnedAlignedSpikes` for two conditions
 
-To better understand how this object works, let's consider a specific example. Suppose we have data for two distinct events (such as two different stimuli) and their associated timestamps, similar to the `BinnedAlignedSpikes` examples mentioned earlier:
+To better understand how this object works, let's consider a specific example. Suppose we have data for two different stimuli and their associated timestamps:
 
 ```python
 import numpy as np
 
 # Two units and 4 bins
-data_for_first_event = np.array(
+data_for_first_stimuli = np.array(
     [
         # Unit 1
         [
@@ -256,7 +250,7 @@ data_for_first_event = np.array(
 )
 
 # Also two units and 4 bins but this event appeared three times
-data_for_second_event = np.array(
+data_for_second_stimuli = np.array(
     [
         # Unit 1
         [
@@ -273,41 +267,40 @@ data_for_second_event = np.array(
     ]
 )
 
-timestamps_first_event = [5.0, 15.0]
-timestamps_second_event = [1.0, 10.0, 20.0]
+timestamps_first_stimuli = [5.0, 15.0]
+timestamps_second_stimuli = [1.0, 10.0, 20.0]
 ```
 
-The way that we would build the data for the `AggregatedBinnedAlignedSpikes` object is as follows:
+The way that we would build the data for the `BinnedAlignedSpikes` object is as follows:
 
 ```python
-from ndx_binned_spikes import AggregatedBinnedAlignedSpikes
+from ndx_binned_spikes import BinnedAlignedSpikes
 
 bin_width_in_milliseconds = 100.0
 milliseconds_from_event_to_first_bin = -50.0
 
-data = np.concatenate([data_for_first_event, data_for_second_event], axis=1)
-timestamps = np.concatenate([timestamps_first_event, timestamps_second_event])
-event_indices = np.concatenate([np.zeros(2), np.ones(3)])
+data = np.concatenate([data_for_first_stimuli, data_for_second_stimuli], axis=1)
+event_timestamps = np.concatenate([timestamps_first_stimuli, timestamps_second_stimuli])
+condition_indices = np.concatenate([np.zeros(2), np.ones(3)])
+condition_labels = ["a", "b"]
 
-sorted_data, sorted_timestamps, sorted_event_indices = AggregatedBinnedAlignedSpikes.sort_data_by_timestamps(data=data, timestamps=timestamps, event_indices=event_indices)
+sorted_data, sorted_event_timestamps, sorted_condition_indices = BinnedAlignedSpikes.sort_data_by_event_timestamps(data=data, event_timestamps=event_timestamps, condition_indices=condition_indices)
 
-aggregated_binned_aligned_spikes = AggregatedBinnedAlignedSpikes(
+binned_aligned_spikes = BinnedAlignedSpikes(
     bin_width_in_milliseconds=bin_width_in_milliseconds,
     milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
     data=sorted_data,   
-    timestamps=sorted_timestamps,  
-    event_indices=sorted_event_indices,  
+    event_timestamps=sorted_event_timestamps,  
+    condition_indices=sorted_condition_indices,  
 )
 ```
 
-Then we can recover the original data by calling the `get_data_for_event` method:
+Then we can recover the original data by calling the `get_data_for_condition` method:
 
 ```python
-retrieved_data_for_first_event = aggregated_binned_aligned_spikes.get_data_for_stimuli(event_index=0)
-np.testing.assert_array_equal(retrieved_data_for_first_event, data_for_first_event)
+retrieved_data_for_first_stimuli = binned_aligned_spikes.get_data_for_condition(condition_index=0)
+np.testing.assert_array_equal(retrieved_data_for_first_stimuli, data_for_first_stimuli)
 ```
-
-The `AggregatedBinnedAlignedSpikes` object can be added to a processing module in an NWB file and written to disk using the same code as before. Plus, a region of the `Units` table can be linked to the `AggregatedBinnedAlignedSpikes` object in the same way as it was done for the `BinnedAlignedSpikes` object.
 
 ---
 This extension was created using [ndx-template](https://github.com/nwb-extensions/ndx-template).

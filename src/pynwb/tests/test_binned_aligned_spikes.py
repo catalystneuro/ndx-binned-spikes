@@ -1,5 +1,4 @@
-"""Unit and integration tests for the example BinnedAlignedSpikes extension neurodata type.
-"""
+"""Unit and integration tests for the example BinnedAlignedSpikes extension neurodata type."""
 
 import numpy as np
 
@@ -62,7 +61,6 @@ class TestBinnedAlignedSpikesConstructor(TestCase):
 
     def test_constructor_units_region(self):
 
-
         units_table = Units()
         units_table.add_column(name="unit_name", description="a readable identifier for the units")
 
@@ -99,7 +97,7 @@ class TestBinnedAlignedSpikesConstructor(TestCase):
 
     def test_constructor_inconsistent_timestamps_and_data_error(self):
         shorter_timestamps = self.event_timestamps[:-1]
-        
+
         with self.assertRaises(ValueError):
             BinnedAlignedSpikes(
                 bin_width_in_milliseconds=self.bin_width_in_milliseconds,
@@ -107,14 +105,155 @@ class TestBinnedAlignedSpikesConstructor(TestCase):
                 data=self.data,
                 event_timestamps=shorter_timestamps,
             )
-            
+
+
+class TestBinnedAlignedSpikesMultipleConditions(TestCase):
+    """Simple unit test for creating a BinnedAlignedSpikes with multiple conditions."""
+
+    def setUp(self):
+        """Set up an NWB file.."""
+
+        self.number_of_units = 2
+        self.number_of_bins = 4
+        self.number_of_events = 5
+        self.number_of_conditions = 2
+
+        self.bin_width_in_milliseconds = 20.0
+        self.milliseconds_from_event_to_first_bin = -100.0
+
+        # Two units in total and 4 bins, and event with two timestamps
+        self.data_for_first_condition = np.array(
+            [
+                # Unit 1 data
+                [
+                    [0, 1, 2, 3],  # Bin counts around the first timestamp
+                    [4, 5, 6, 7],  # Bin counts around the second timestamp
+                ],
+                # Unit 2 data
+                [
+                    [8, 9, 10, 11],  # Bin counts around the first timestamp
+                    [12, 13, 14, 15],  # Bin counts around the second timestamp
+                ],
+            ],
+        )
+
+        # Also two units and 4 bins but this event appeared three times
+        self.data_for_second_condition = np.array(
+            [
+                # Unit 1 data
+                [
+                    [0, 1, 2, 3],  # Bin counts around the first timestamp
+                    [4, 5, 6, 7],  # Bin counts around the second timestamp
+                    [8, 9, 10, 11],  # Bin counts around the third timestamp
+                ],
+                # Unit 2 data
+                [
+                    [12, 13, 14, 15],  # Bin counts around the first timestamp
+                    [16, 17, 18, 19],  # Bin counts around the second timestamp
+                    [20, 21, 22, 23],  # Bin counts around the third timestamp
+                ],
+            ]
+        )
+
+        self.timestamps_first_condition = [5.0, 15.0]
+        self.timestamps_second_condition = [0.0, 10.0, 20.0]
+
+        data_list = [self.data_for_first_condition, self.data_for_second_condition]
+        self.data = np.concatenate(data_list, axis=1)
+
+        indices_list = [np.full(data.shape[1], condition_index) for condition_index, data in enumerate(data_list)]
+        self.condition_indices = np.concatenate(indices_list)
+
+        self.event_timestamps = np.concatenate([self.timestamps_first_condition, self.timestamps_second_condition])
+
+        self.sorted_indices = np.argsort(self.event_timestamps)
+        
+        self.condition_labels = ["first", "second"]
+
+    def test_constructor(self):
+        """Test that the constructor for BinnedAlignedSpikes sets values as expected."""
+
+        # Test error if the timestamps are not sorted and/or aligned to conditions
+        with self.assertRaises(ValueError):
+            BinnedAlignedSpikes(
+                bin_width_in_milliseconds=self.bin_width_in_milliseconds,
+                milliseconds_from_event_to_first_bin=self.milliseconds_from_event_to_first_bin,
+                data=self.data,
+                event_timestamps=self.event_timestamps,
+                condition_indices=self.condition_indices,
+            )
+
+        data, event_timestamps, condition_indices = BinnedAlignedSpikes.sort_data_by_event_timestamps(
+            self.data,
+            self.event_timestamps,
+            self.condition_indices,
+        )
+
+        aggregated_binnned_align_spikes = BinnedAlignedSpikes(
+            bin_width_in_milliseconds=self.bin_width_in_milliseconds,
+            milliseconds_from_event_to_first_bin=self.milliseconds_from_event_to_first_bin,
+            data=data,
+            event_timestamps=event_timestamps,
+            condition_indices=condition_indices,
+            condition_labels=self.condition_labels,
+        )
+
+        np.testing.assert_array_equal(aggregated_binnned_align_spikes.data, self.data[:, self.sorted_indices, :])
+        np.testing.assert_array_equal(
+            aggregated_binnned_align_spikes.condition_indices, self.condition_indices[self.sorted_indices]
+        )
+        np.testing.assert_array_equal(
+            aggregated_binnned_align_spikes.event_timestamps, self.event_timestamps[self.sorted_indices]
+        )
+        
+        np.testing.assert_array_equal(
+            aggregated_binnned_align_spikes.condition_labels, self.condition_labels
+        )
+        
+        self.assertEqual(aggregated_binnned_align_spikes.bin_width_in_milliseconds, self.bin_width_in_milliseconds)
+        self.assertEqual(
+            aggregated_binnned_align_spikes.milliseconds_from_event_to_first_bin,
+            self.milliseconds_from_event_to_first_bin,
+        )
+
+        self.assertEqual(aggregated_binnned_align_spikes.data.shape[0], self.number_of_units)
+        self.assertEqual(aggregated_binnned_align_spikes.data.shape[1], self.number_of_events)
+        self.assertEqual(aggregated_binnned_align_spikes.data.shape[2], self.number_of_bins)
+
+    def test_get_single_condition_data_methods(self):
+
+        data, event_timestamps, condition_indices = BinnedAlignedSpikes.sort_data_by_event_timestamps(
+            self.data,
+            self.event_timestamps,
+            self.condition_indices,
+        )
+
+        aggregated_binnned_align_spikes = BinnedAlignedSpikes(
+            bin_width_in_milliseconds=self.bin_width_in_milliseconds,
+            milliseconds_from_event_to_first_bin=self.milliseconds_from_event_to_first_bin,
+            data=data,
+            event_timestamps=event_timestamps,
+            condition_indices=condition_indices,
+        )
+
+        data_condition1 = aggregated_binnned_align_spikes.get_data_for_condition(condition_index=0)
+        np.testing.assert_allclose(data_condition1, self.data_for_first_condition)
+
+        data_condition2 = aggregated_binnned_align_spikes.get_data_for_condition(condition_index=1)
+        np.testing.assert_allclose(data_condition2, self.data_for_second_condition)
+
+        timestamps_condition1 = aggregated_binnned_align_spikes.get_event_timestamps_for_condition(condition_index=0)
+        np.testing.assert_allclose(timestamps_condition1, self.timestamps_first_condition)
+
+        timestamps_condition2 = aggregated_binnned_align_spikes.get_event_timestamps_for_condition(condition_index=1)
+        np.testing.assert_allclose(timestamps_condition2, self.timestamps_second_condition)
+
 
 class TestBinnedAlignedSpikesSimpleRoundtrip(TestCase):
     """Simple roundtrip test for BinnedAlignedSpikes."""
 
     def setUp(self):
         self.nwbfile = mock_NWBFile()
-
 
         self.path = "test.nwb"
 
@@ -126,7 +265,9 @@ class TestBinnedAlignedSpikesSimpleRoundtrip(TestCase):
         Add a BinnedAlignedSpikes to an NWBFile, write it to file, read the file
         and test that the BinnedAlignedSpikes from the file matches the original BinnedAlignedSpikes.
         """
-        self.binned_aligned_spikes = mock_BinnedAlignedSpikes()
+
+        # Testing here
+        self.binned_aligned_spikes = mock_BinnedAlignedSpikes(number_of_conditions=3, condition_labels=["a", "b", "c"])
 
         self.nwbfile.add_acquisition(self.binned_aligned_spikes)
 
@@ -164,7 +305,6 @@ class TestBinnedAlignedSpikesSimpleRoundtrip(TestCase):
         binned_aligned_spikes_with_region = mock_BinnedAlignedSpikes(units_region=units_region)
         self.nwbfile.add_acquisition(binned_aligned_spikes_with_region)
 
-    
         with NWBHDF5IO(self.path, mode="w") as io:
             io.write(self.nwbfile)
 
@@ -172,4 +312,3 @@ class TestBinnedAlignedSpikesSimpleRoundtrip(TestCase):
             read_nwbfile = io.read()
             read_container = read_nwbfile.acquisition["BinnedAlignedSpikes"]
             self.assertContainerEqual(binned_aligned_spikes_with_region, read_container)
-
