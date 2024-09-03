@@ -2,7 +2,7 @@ groups:
 - neurodata_type_def: BinnedAlignedSpikes
   neurodata_type_inc: NWBDataInterface
   default_name: BinnedAlignedSpikes
-  doc: A data interface for binned spike data aligned to an event (e.g. a stimuli
+  doc: A data interface for binned spike data aligned to an event (e.g. a stimulus
     or the beginning of a trial).
   attributes:
   - name: name
@@ -11,7 +11,8 @@ groups:
     doc: The name of this container
   - name: description
     dtype: text
-    value: Spikes data binned and aligned to the timestamps of one or multiple conditions.
+    value: Spikes data binned and aligned to the event timestamps of one or multiple
+      conditions.
     doc: A description of what the data represents
   - name: bin_width_in_milliseconds
     dtype: float64
@@ -25,7 +26,7 @@ groups:
     required: false
   datasets:
   - name: data
-    dtype: numeric
+    dtype: uint64
     dims:
     - num_units
     - number_of_events
@@ -53,6 +54,17 @@ groups:
     doc: The index of the condition that each timestamps corresponds to (e.g. a stimulus
       type, trial number, category, etc.).This is only used when the data is aligned
       to multiple conditions
+    quantity: '?'
+  - name: condition_labels
+    dtype: text
+    dims:
+    - number_of_conditions
+    shape:
+    - null
+    doc: The labels of the conditions that the data is aligned to. The size of this
+      array should match the number of conditions. This is only used when the data
+      is aligned to multiple conditions. First condition is index 0, second is index
+      1, etc.
     quantity: '?'
   - name: units_region
     neurodata_type_inc: DynamicTableRegion

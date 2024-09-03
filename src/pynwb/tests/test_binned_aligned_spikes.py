@@ -167,6 +167,8 @@ class TestBinnedAlignedSpikesMultipleConditions(TestCase):
         self.event_timestamps = np.concatenate([self.timestamps_first_condition, self.timestamps_second_condition])
 
         self.sorted_indices = np.argsort(self.event_timestamps)
+        
+        self.condition_labels = ["first", "second"]
 
     def test_constructor(self):
         """Test that the constructor for BinnedAlignedSpikes sets values as expected."""
@@ -193,6 +195,7 @@ class TestBinnedAlignedSpikesMultipleConditions(TestCase):
             data=data,
             event_timestamps=event_timestamps,
             condition_indices=condition_indices,
+            condition_labels=self.condition_labels,
         )
 
         np.testing.assert_array_equal(aggregated_binnned_align_spikes.data, self.data[:, self.sorted_indices, :])
@@ -202,6 +205,11 @@ class TestBinnedAlignedSpikesMultipleConditions(TestCase):
         np.testing.assert_array_equal(
             aggregated_binnned_align_spikes.event_timestamps, self.event_timestamps[self.sorted_indices]
         )
+        
+        np.testing.assert_array_equal(
+            aggregated_binnned_align_spikes.condition_labels, self.condition_labels
+        )
+        
         self.assertEqual(aggregated_binnned_align_spikes.bin_width_in_milliseconds, self.bin_width_in_milliseconds)
         self.assertEqual(
             aggregated_binnned_align_spikes.milliseconds_from_event_to_first_bin,
@@ -259,7 +267,7 @@ class TestBinnedAlignedSpikesSimpleRoundtrip(TestCase):
         """
 
         # Testing here
-        self.binned_aligned_spikes = mock_BinnedAlignedSpikes(number_of_conditions=0)
+        self.binned_aligned_spikes = mock_BinnedAlignedSpikes(number_of_conditions=3, condition_labels=["a", "b", "c"])
 
         self.nwbfile.add_acquisition(self.binned_aligned_spikes)
 

@@ -29,7 +29,7 @@ def main():
             "The binned data. It should be an array whose first dimension is the number of units, the second dimension "
             "is the number of events, and the third dimension is the number of bins."
             ),
-        dtype="numeric",  # TODO should this be a uint64?
+        dtype="uint64",  
         shape=[None, None, None],
         dims=["num_units", "number_of_events", "number_of_bins"],
     )
@@ -63,12 +63,25 @@ def main():
         quantity="?",
     )
     
+    condition_labels = NWBDatasetSpec(
+        name="condition_labels",
+        doc=(
+            "The labels of the conditions that the data is aligned to. The size of this array should match "
+            "the number of conditions. This is only used when the data is aligned to multiple conditions. "
+            "First condition is index 0, second is index 1, etc."
+        ),
+        dtype="text",
+        shape=[None],
+        dims=["number_of_conditions"],
+        quantity="?",
+    )
+    
     binned_aligned_spikes = NWBGroupSpec(
         neurodata_type_def="BinnedAlignedSpikes",
         neurodata_type_inc="NWBDataInterface",
         default_name="BinnedAlignedSpikes",
         doc="A data interface for binned spike data aligned to an event (e.g. a stimulus or the beginning of a trial).",
-        datasets=[binned_aligned_spikes_data, event_timestamps, condition_indices, units_region],
+        datasets=[binned_aligned_spikes_data, event_timestamps, condition_indices, condition_labels, units_region],
         attributes=[
             NWBAttributeSpec(
                 name="name",
