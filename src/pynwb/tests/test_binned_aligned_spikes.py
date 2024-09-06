@@ -50,14 +50,17 @@ class TestBinnedAlignedSpikesConstructor(TestCase):
 
         np.testing.assert_array_equal(binned_aligned_spikes.data, self.data)
         np.testing.assert_array_equal(binned_aligned_spikes.event_timestamps, self.event_timestamps)
+        
+        
+        
         self.assertEqual(binned_aligned_spikes.bin_width_in_milliseconds, self.bin_width_in_milliseconds)
         self.assertEqual(
             binned_aligned_spikes.milliseconds_from_event_to_first_bin, self.milliseconds_from_event_to_first_bin
         )
 
-        self.assertEqual(binned_aligned_spikes.data.shape[0], self.number_of_units)
-        self.assertEqual(binned_aligned_spikes.data.shape[1], self.number_of_events)
-        self.assertEqual(binned_aligned_spikes.data.shape[2], self.number_of_bins)
+        self.assertEqual(binned_aligned_spikes.number_of_units, self.number_of_units)
+        self.assertEqual(binned_aligned_spikes.number_of_events, self.number_of_events)
+        self.assertEqual(binned_aligned_spikes.number_of_bins, self.number_of_bins)
 
     def test_constructor_units_region(self):
 
@@ -216,9 +219,9 @@ class TestBinnedAlignedSpikesMultipleConditions(TestCase):
             self.milliseconds_from_event_to_first_bin,
         )
 
-        self.assertEqual(aggregated_binnned_align_spikes.data.shape[0], self.number_of_units)
-        self.assertEqual(aggregated_binnned_align_spikes.data.shape[1], self.number_of_events)
-        self.assertEqual(aggregated_binnned_align_spikes.data.shape[2], self.number_of_bins)
+        self.assertEqual(aggregated_binnned_align_spikes.number_of_units, self.number_of_units)
+        self.assertEqual(aggregated_binnned_align_spikes.number_of_events, self.number_of_events)
+        self.assertEqual(aggregated_binnned_align_spikes.data.number_of_bins, self.number_of_bins)
 
     def test_get_single_condition_data_methods(self):
 
@@ -267,6 +270,9 @@ class TestBinnedAlignedSpikesSimpleRoundtrip(TestCase):
         """
 
         # Testing here
+        number_of_units = 5
+        number_of_bins = 10
+        number_of_events = 100
         self.binned_aligned_spikes = mock_BinnedAlignedSpikes(number_of_conditions=3, condition_labels=["a", "b", "c"])
 
         self.nwbfile.add_acquisition(self.binned_aligned_spikes)
@@ -276,8 +282,14 @@ class TestBinnedAlignedSpikesSimpleRoundtrip(TestCase):
 
         with NWBHDF5IO(self.path, mode="r", load_namespaces=True) as io:
             read_nwbfile = io.read()
-            read_container = read_nwbfile.acquisition["BinnedAlignedSpikes"]
-            self.assertContainerEqual(self.binned_aligned_spikes, read_container)
+            read_binned_aligned_spikes = read_nwbfile.acquisition["BinnedAlignedSpikes"]
+            self.assertContainerEqual(self.binned_aligned_spikes, read_binned_aligned_spikes)
+            
+            assert read_binned_aligned_spikes.number_of_units == number_of_units
+            assert read_binned_aligned_spikes.number_of_bins == number_of_bins
+            assert read_binned_aligned_spikes.number_of_events == number_of_events
+
+            
 
     def test_roundtrip_processing_module(self):
         self.binned_aligned_spikes = mock_BinnedAlignedSpikes()

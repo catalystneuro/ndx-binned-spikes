@@ -249,7 +249,7 @@ data_for_first_stimuli = np.array(
     ],
 )
 
-# Also two units and 4 bins but this event appeared three times
+# Also two units and 4 bins but this condition occured three times
 data_for_second_stimuli = np.array(
     [
         # Unit 1
