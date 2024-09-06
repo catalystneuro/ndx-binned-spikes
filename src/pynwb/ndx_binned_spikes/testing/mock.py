@@ -2,39 +2,7 @@ from typing import Optional
 
 from ndx_binned_spikes import BinnedAlignedSpikes
 import numpy as np
-from pynwb import NWBFile
-from pynwb.misc import Units
 from hdmf.common import DynamicTableRegion
-
-
-# TODO: Remove once pynwb 2.7.0 is released and use the mock class there
-def mock_Units(
-    num_units: int = 10,
-    max_spikes_per_unit: int = 10,
-    seed: int = 0,
-    nwbfile: Optional[NWBFile] = None,
-) -> Units:
-
-    units_table = Units(name="units")  # This is for nwbfile.units= mock_Units() to work
-    units_table.add_column(name="unit_name", description="a readable identifier for the unit")
-
-    rng = np.random.default_rng(seed=seed)
-
-    times = rng.random(size=(num_units, max_spikes_per_unit)).cumsum(axis=1)
-    spikes_per_unit = rng.integers(1, max_spikes_per_unit, size=num_units)
-
-    spike_times = []
-    for unit_index in range(num_units):
-
-        # Not all units have the same number of spikes
-        spike_times = times[unit_index, : spikes_per_unit[unit_index]]
-        unit_name = f"unit_{unit_index}"
-        units_table.add_unit(spike_times=spike_times, unit_name=unit_name)
-
-    if nwbfile is not None:
-        nwbfile.units = units_table
-
-    return units_table
 
 
 def mock_BinnedAlignedSpikes(

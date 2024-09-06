@@ -8,7 +8,8 @@ from pynwb.testing import TestCase, remove_test_file
 from hdmf.common import DynamicTableRegion
 from pynwb.misc import Units
 from ndx_binned_spikes import BinnedAlignedSpikes
-from ndx_binned_spikes.testing.mock import mock_BinnedAlignedSpikes, mock_Units
+from ndx_binned_spikes.testing.mock import mock_BinnedAlignedSpikes
+from pynwb.testing.mock.ecephys import mock_Units
 
 
 class TestBinnedAlignedSpikesConstructor(TestCase):
