@@ -39,6 +39,7 @@ data = np.array(
             [2, 7, 4, 1],  # Bin counts around the third timestamp
         ],
     ],
+    dtype="uint64",
 )
 
 event_timestamps = np.array([0.25, 5.0, 12.25])  # The timestamps to which we align the counts

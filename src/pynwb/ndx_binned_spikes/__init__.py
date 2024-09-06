@@ -185,6 +185,25 @@ class BinnedAlignedSpikes(NWBDataInterface):
 
         return data, event_timestamps, condition_indices
 
+    @property
+    def number_of_units(self):
+        return self.data.shape[0]
+
+    @property
+    def number_of_events(self):
+        return self.data.shape[1]
+
+    @property
+    def number_of_bins(self):
+        return self.data.shape[2]
+    
+
+    @property
+    def number_of_conditions(self):
+        if self.has_multiple_conditions:
+            return np.unique(self.condition_indices).size
+        else:
+            return 1
 
 # Remove these functions from the package
 del load_namespaces, get_class

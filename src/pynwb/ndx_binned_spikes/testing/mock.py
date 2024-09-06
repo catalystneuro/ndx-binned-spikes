@@ -99,7 +99,7 @@ def mock_BinnedAlignedSpikes(
         number_of_units, number_of_events, number_of_bins = data.shape
     else:
         rng = np.random.default_rng(seed=seed)
-        data = rng.integers(low=0, high=100, size=(number_of_units, number_of_events, number_of_bins))
+        data = rng.integers(low=0, high=100, size=(number_of_units, number_of_events, number_of_bins), dtype="uint64")
 
     # Assert data shapes
     assertion_msg = (
@@ -121,8 +121,8 @@ def mock_BinnedAlignedSpikes(
             number_of_conditions < number_of_events
         ), "The number of conditions should be less than the number of events."
 
-        condition_indices = np.zeros(number_of_events, dtype=int)
-        all_indices = np.arange(number_of_conditions, dtype=int)
+        condition_indices = np.zeros(number_of_events, dtype="uint64")
+        all_indices = np.arange(number_of_conditions, dtype='uint64')
 
         # Ensure all conditions indices appear at least once
         condition_indices[:number_of_conditions] = rng.choice(all_indices, size=number_of_conditions, replace=False)
