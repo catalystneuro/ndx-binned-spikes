@@ -156,7 +156,7 @@ class BinnedAlignedSpikes(NWBDataInterface):
         if not self.has_multiple_conditions:
             return self.data
 
-        mask = self.condition_indices == condition_index
+        mask = self.condition_indices[:] == condition_index
         binned_spikes_for_unit = self.data[:, mask, :]
 
         return binned_spikes_for_unit
