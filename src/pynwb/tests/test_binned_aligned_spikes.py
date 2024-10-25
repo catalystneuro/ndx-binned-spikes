@@ -295,6 +295,11 @@ class TestBinnedAlignedSpikesSimpleRoundtrip(TestCase):
             assert read_binned_aligned_spikes.number_of_bins == number_of_bins
             assert read_binned_aligned_spikes.number_of_events == number_of_events
             assert read_binned_aligned_spikes.number_of_conditions == number_of_conditions
+            
+            expected_data_condition1 = self.binned_aligned_spikes.get_data_for_condition(condition_index=2)
+            data_condition1 = read_binned_aligned_spikes.get_data_for_condition(condition_index=2)
+
+            np.testing.assert_equal(data_condition1, expected_data_condition1)
 
     def test_roundtrip_processing_module(self):
         self.binned_aligned_spikes = mock_BinnedAlignedSpikes()
