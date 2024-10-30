@@ -273,7 +273,7 @@ class TestBinnedAlignedSpikesSimpleRoundtrip(TestCase):
         number_of_conditions = 3
         condition_labels = ["a", "b", "c"]
 
-        self.binned_aligned_spikes = mock_BinnedAlignedSpikes(
+        binned_aligned_spikes = mock_BinnedAlignedSpikes(
             number_of_units=number_of_units,
             number_of_bins=number_of_bins,
             number_of_events=number_of_events,
@@ -281,7 +281,7 @@ class TestBinnedAlignedSpikesSimpleRoundtrip(TestCase):
             condition_labels=condition_labels,
         )
 
-        self.nwbfile.add_acquisition(self.binned_aligned_spikes)
+        self.nwbfile.add_acquisition(binned_aligned_spikes)
 
         with NWBHDF5IO(self.path, mode="w") as io:
             io.write(self.nwbfile)
@@ -289,23 +289,23 @@ class TestBinnedAlignedSpikesSimpleRoundtrip(TestCase):
         with NWBHDF5IO(self.path, mode="r", load_namespaces=True) as io:
             read_nwbfile = io.read()
             read_binned_aligned_spikes = read_nwbfile.acquisition["BinnedAlignedSpikes"]
-            self.assertContainerEqual(self.binned_aligned_spikes, read_binned_aligned_spikes)
+            self.assertContainerEqual(binned_aligned_spikes, read_binned_aligned_spikes)
 
             assert read_binned_aligned_spikes.number_of_units == number_of_units
             assert read_binned_aligned_spikes.number_of_bins == number_of_bins
             assert read_binned_aligned_spikes.number_of_events == number_of_events
             assert read_binned_aligned_spikes.number_of_conditions == number_of_conditions
             
-            expected_data_condition1 = self.binned_aligned_spikes.get_data_for_condition(condition_index=2)
+            expected_data_condition1 = binned_aligned_spikes.get_data_for_condition(condition_index=2)
             data_condition1 = read_binned_aligned_spikes.get_data_for_condition(condition_index=2)
 
             np.testing.assert_equal(data_condition1, expected_data_condition1)
 
     def test_roundtrip_processing_module(self):
-        self.binned_aligned_spikes = mock_BinnedAlignedSpikes()
+        binned_aligned_spikes = mock_BinnedAlignedSpikes()
 
         ecephys_processinng_module = self.nwbfile.create_processing_module(name="ecephys", description="a description")
-        ecephys_processinng_module.add(self.binned_aligned_spikes)
+        ecephys_processinng_module.add(binned_aligned_spikes)
 
         with NWBHDF5IO(self.path, mode="w") as io:
             io.write(self.nwbfile)
@@ -313,7 +313,7 @@ class TestBinnedAlignedSpikesSimpleRoundtrip(TestCase):
         with NWBHDF5IO(self.path, mode="r", load_namespaces=True) as io:
             read_nwbfile = io.read()
             read_container = read_nwbfile.processing["ecephys"]["BinnedAlignedSpikes"]
-            self.assertContainerEqual(self.binned_aligned_spikes, read_container)
+            self.assertContainerEqual(binned_aligned_spikes, read_container)
 
     def test_roundtrip_with_units_table(self):
 
@@ -332,7 +332,20 @@ class TestBinnedAlignedSpikesSimpleRoundtrip(TestCase):
 
         with NWBHDF5IO(self.path, mode="r", load_namespaces=True) as io:
             read_nwbfile = io.read()
-            read_container = read_nwbfile.acquisition["BinnedAlignedSpikes"]
-            self.assertContainerEqual(binned_aligned_spikes_with_region, read_container)
+            read_binned_aligned_spikes = read_nwbfile.acquisition["BinnedAlignedSpikes"]
+            self.assertContainerEqual(binned_aligned_spikes_with_region, read_binned_aligned_spikes)
 
 
+    def test_data_with_nans(self):
+        
+        binned_aligned_spikes = mock_BinnedAlignedSpikes(add_random_nans=True)
+
+        self.nwbfile.add_acquisition(binned_aligned_spikes)
+
+        with NWBHDF5IO(self.path, mode="w") as io:
+            io.write(self.nwbfile)
+
+        with NWBHDF5IO(self.path, mode="r", load_namespaces=True) as io:
+            read_nwbfile = io.read()
+            read_binned_aligned_spikes = read_nwbfile.acquisition["BinnedAlignedSpikes"]
+            self.assertContainerEqual(binned_aligned_spikes, read_binned_aligned_spikes)
