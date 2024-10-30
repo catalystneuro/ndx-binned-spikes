@@ -26,7 +26,7 @@ groups:
     required: false
   datasets:
   - name: data
-    dtype: uint64
+    dtype: numeric
     dims:
     - num_units
     - number_of_events

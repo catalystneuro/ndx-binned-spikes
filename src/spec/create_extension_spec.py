@@ -29,7 +29,7 @@ def main():
             "The binned data. It should be an array whose first dimension is the number of units, the second dimension "
             "is the number of events, and the third dimension is the number of bins."
             ),
-        dtype="uint64",  
+        dtype="numeric",  
         shape=[None, None, None],
         dims=["num_units", "number_of_events", "number_of_bins"],
     )

@@ -34,6 +34,7 @@ class BinnedAlignedSpikes(NWBDataInterface):
         "data",
         "timestamps",
         "condition_indices",
+        "condition_labels",
         {"name": "units_region", "child": True},  # TODO, I forgot why this is included
     )
 

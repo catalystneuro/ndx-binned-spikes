@@ -19,6 +19,7 @@ def mock_BinnedAlignedSpikes(
     condition_labels: Optional[np.ndarray] = None,
     units_region: Optional[DynamicTableRegion] = None,
     sort_data: bool = True,
+    add_random_nans: bool = False,
 ) -> BinnedAlignedSpikes:
     """
     Generate a mock BinnedAlignedSpikes object with specified parameters or from given data.
@@ -62,7 +63,7 @@ def mock_BinnedAlignedSpikes(
     BinnedAlignedSpikes
         A mock BinnedAlignedSpikes object populated with the provided or generated data and parameters.
     """
-
+    
     if data is not None:
         number_of_units, number_of_events, number_of_bins = data.shape
     else:
@@ -117,6 +118,12 @@ def mock_BinnedAlignedSpikes(
         data = data[:, sorted_indices, :]
         if condition_indices is not None:
             condition_indices = condition_indices[sorted_indices]
+
+    # Add random nans over all the data
+    if add_random_nans:
+        data = data.astype("float32")
+        nan_mask = rng.choice([True, False], size=data.shape, p=[0.1, 0.9])
+        data[nan_mask] = np.nan
 
     binned_aligned_spikes = BinnedAlignedSpikes(
         bin_width_in_milliseconds=bin_width_in_milliseconds,
