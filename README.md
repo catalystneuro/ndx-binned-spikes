@@ -29,14 +29,14 @@ from ndx_binned_spikes import BinnedAlignedSpikes
 data = np.array(
     [
         [  # Data of unit with index 0
-            [5, 1, 3, 2],  # Bin counts around the first event's reference timestamp
-            [6, 3, 4, 3],  # Bin counts around the second event's reference timestamp
-            [4, 2, 1, 4],  # Bin counts around the third event's reference timestamp
+            [5, 1, 3, 2],  # Bin counts around the first event's timestamp
+            [6, 3, 4, 3],  # Bin counts around the second event's timestamp
+            [4, 2, 1, 4],  # Bin counts around the third event's timestamp
         ],
         [ # Data of unit with index 1
-            [8, 4, 0, 2],  # Bin counts around the first event's reference timestamp
-            [3, 3, 4, 2],  # Bin counts around the second event's reference timestamp
-            [2, 7, 4, 1],  # Bin counts around the third event's reference timestamp
+            [8, 4, 0, 2],  # Bin counts around the first event's timestamp
+            [3, 3, 4, 2],  # Bin counts around the second event's timestamp
+            [2, 7, 4, 1],  # Bin counts around the third event's timestamp
         ],
     ],
     dtype="uint64",
@@ -144,14 +144,14 @@ from hdmf.common import DynamicTableRegion
 data = np.array(
     [
         [  # Data of the unit 1 in the units table
-            [5, 1, 3, 2],  # Bin counts around the first event's reference timestamp
-            [6, 3, 4, 3],  # Bin counts around the second event's reference timestamp
-            [4, 2, 1, 4],  # Bin counts around the third event's reference timestamp
+            [5, 1, 3, 2],  # Bin counts around the first event's timestamp
+            [6, 3, 4, 3],  # Bin counts around the second event's timestamp
+            [4, 2, 1, 4],  # Bin counts around the third event's timestamp
         ],
         [ # Data of the unit 3 in the units table
-            [8, 4, 0, 2],  # Bin counts around the first event's reference timestamp
-            [3, 3, 4, 2],  # Bin counts around the second event's reference timestamp
-            [2, 7, 4, 1],  # Bin counts around the third event's reference timestamp
+            [8, 4, 0, 2],  # Bin counts around the first event's timestamp
+            [3, 3, 4, 2],  # Bin counts around the second event's timestamp
+            [2, 7, 4, 1],  # Bin counts around the third event's timestamp
         ],
     ],
 )
@@ -239,13 +239,13 @@ data_for_first_stimuli = np.array(
     [
         # Unit 1
         [
-            [0, 1, 2, 3],  # Bin counts around the first event's reference timestamp
-            [4, 5, 6, 7],  # Bin counts around the second event's reference timestamp
+            [0, 1, 2, 3],  # Bin counts around the first event's timestamp
+            [4, 5, 6, 7],  # Bin counts around the second event's timestamp
         ],
         # Unit 2
         [
-            [8, 9, 10, 11],  # Bin counts around the first event's reference timestamp
-            [12, 13, 14, 15],  # Bin counts around the second event's reference timestamp
+            [8, 9, 10, 11],  # Bin counts around the first event's timestamp
+            [12, 13, 14, 15],  # Bin counts around the second event's timestamp
         ],
     ],
 )
@@ -255,15 +255,15 @@ data_for_second_stimuli = np.array(
     [
         # Unit 1
         [
-            [0, 1, 2, 3],  # Bin counts around the first event's reference timestamp
-            [4, 5, 6, 7],  # Bin counts around the second event's reference timestamp
-            [8, 9, 10, 11],  # Bin counts around the third event's reference timestamp
+            [0, 1, 2, 3],  # Bin counts around the first event's timestamp
+            [4, 5, 6, 7],  # Bin counts around the second event's timestamp
+            [8, 9, 10, 11],  # Bin counts around the third event's timestamp
         ],
         # Unit 2
         [
-            [12, 13, 14, 15],  # Bin counts around the first event's reference timestamp
-            [16, 17, 18, 19],  # Bin counts around the second event's reference timestamp
-            [20, 21, 22, 23],  # Bin counts around the third event's reference timestamp
+            [12, 13, 14, 15],  # Bin counts around the first event's timestamp
+            [16, 17, 18, 19],  # Bin counts around the second event's timestamp
+            [20, 21, 22, 23],  # Bin counts around the third event's timestamp
         ],
     ]
 )
