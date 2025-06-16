@@ -206,5 +206,79 @@ class BinnedAlignedSpikes(NWBDataInterface):
         else:
             return 1
 
+@register_class(neurodata_type="BinnedSpikes", namespace="ndx-binned-spikes")  # noqa
+class BinnedSpikes(NWBDataInterface):
+    __nwbfields__ = (
+        "name",
+        "description",
+        "bin_width_in_milliseconds",
+        "milliseconds_from_event_to_first_bin",
+        "data",
+        {"name": "units_region", "child": True},
+    )
+
+    DEFAULT_NAME = "BinnedSpikes"
+    DEFAULT_DESCRIPTION = "Binned spike counts."
+
+    @docval(
+        {
+            "name": "name",
+            "type": str,
+            "doc": "The name of this container",
+            "default": DEFAULT_NAME,
+        },
+        {
+            "name": "description",
+            "type": str,
+            "doc": "A description of what the data represents",
+            "default": DEFAULT_DESCRIPTION,
+        },
+        {
+            "name": "bin_width_in_milliseconds",
+            "type": float,
+            "doc": "The length in milliseconds of the bins",
+        },
+        {
+            "name": "milliseconds_from_event_to_first_bin",
+            "type": float,
+            "doc": (
+                "The time in milliseconds from the event to the beginning of the first bin. A negative value indicates"
+                "that the first bin is before the event whereas a positive value indicates that the first bin is "
+                "after the event."
+            ),
+            "default": 0.0,
+        },
+        {
+            "name": "data",
+            "type": "array_data",
+            "shape": [(None, None)],
+            "doc": (
+                "The binned data. It should be an array whose first dimension is the number of units, "
+                "and the second dimension is the number of bins."
+            ),
+        },
+        {
+            "name": "units_region",
+            "type": DynamicTableRegion,
+            "doc": "A reference to the Units table region that contains the units of the data.",
+            "default": None,
+        },
+    )
+    def __init__(self, **kwargs):
+        name = kwargs.pop("name")
+        super().__init__(name=name)
+
+        for key in kwargs:
+            setattr(self, key, kwargs[key])
+
+    @property
+    def number_of_units(self):
+        return self.data.shape[0]
+
+    @property
+    def number_of_bins(self):
+        return self.data.shape[1]
+
+
 # Remove these functions from the package
 del load_namespaces, get_class
