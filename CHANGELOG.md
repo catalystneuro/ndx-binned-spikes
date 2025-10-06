@@ -1,5 +1,5 @@
 # Changelog for ndx-binned-spikes
-## [0.3.0] - 2025-01-XX
+## [0.3.0] - 2025-10-06
 
 ### Added
 - New `BinnedSpikes` class for storing non-aligned binned spike counts across entire sessions
