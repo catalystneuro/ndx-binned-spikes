@@ -20,8 +20,8 @@ class TestBinnedSpikesConstructor(TestCase):
 
         self.number_of_units = 2
         self.number_of_bins = 10
-        self.bin_width_in_milliseconds = 20.0
-        self.milliseconds_from_event_to_first_bin = -100.0
+        self.bin_width_in_ms = 20.0
+        self.start_time_in_ms = -100.0
         self.rng = np.random.default_rng(seed=0)
 
         self.data = self.rng.integers(
@@ -39,16 +39,16 @@ class TestBinnedSpikesConstructor(TestCase):
         """Test that the constructor for BinnedSpikes sets values as expected."""
 
         binned_spikes = BinnedSpikes(
-            bin_width_in_milliseconds=self.bin_width_in_milliseconds,
-            milliseconds_from_event_to_first_bin=self.milliseconds_from_event_to_first_bin,
+            bin_width_in_ms=self.bin_width_in_ms,
+            start_time_in_ms=self.start_time_in_ms,
             data=self.data,
         )
 
         np.testing.assert_array_equal(binned_spikes.data, self.data)
 
-        self.assertEqual(binned_spikes.bin_width_in_milliseconds, self.bin_width_in_milliseconds)
+        self.assertEqual(binned_spikes.bin_width_in_ms, self.bin_width_in_ms)
         self.assertEqual(
-            binned_spikes.milliseconds_from_event_to_first_bin, self.milliseconds_from_event_to_first_bin
+            binned_spikes.start_time_in_ms, self.start_time_in_ms
         )
 
         self.assertEqual(binned_spikes.number_of_units, self.number_of_units)
@@ -77,8 +77,8 @@ class TestBinnedSpikesConstructor(TestCase):
         )
 
         binned_spikes = BinnedSpikes(
-            bin_width_in_milliseconds=self.bin_width_in_milliseconds,
-            milliseconds_from_event_to_first_bin=self.milliseconds_from_event_to_first_bin,
+            bin_width_in_ms=self.bin_width_in_ms,
+            start_time_in_ms=self.start_time_in_ms,
             data=self.data,
             units_region=units_region,
         )

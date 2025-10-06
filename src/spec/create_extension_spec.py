@@ -96,7 +96,7 @@ def main():
                 value="Spikes data binned and aligned to the event timestamps of one or multiple conditions.",
             ),
             NWBAttributeSpec(
-                name="bin_width_in_milliseconds",
+                name="bin_width_in_ms",
                 doc="The length in milliseconds of the bins",
                 dtype="float64",
             ),
@@ -105,7 +105,7 @@ def main():
                 doc=(
                 "The time in milliseconds from the event to the beginning of the first bin. A negative value indicates"
                 "that the first bin is before the event whereas a positive value indicates that the first bin is "
-                "after the event." 
+                "after the event."
                 ),
                 dtype="float64",
                 default_value=0.0,
@@ -146,16 +146,15 @@ def main():
                 value="Binned spike counts.",
             ),
             NWBAttributeSpec(
-                name="bin_width_in_milliseconds",
+                name="bin_width_in_ms",
                 doc="The length in milliseconds of the bins",
                 dtype="float64",
             ),
             NWBAttributeSpec(
-                name="milliseconds_from_event_to_first_bin",
+                name="start_time_in_ms",
                 doc=(
-                "The time in milliseconds from the event to the beginning of the first bin. A negative value indicates"
-                "that the first bin is before the event whereas a positive value indicates that the first bin is "
-                "after the event." 
+                "The timestamp of the beginning of the first bin in milliseconds. The default "
+                "value is 0, which represents the beginning of the session."
                 ),
                 dtype="float64",
                 default_value=0.0,

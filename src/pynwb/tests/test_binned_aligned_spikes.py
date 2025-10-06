@@ -21,7 +21,7 @@ class TestBinnedAlignedSpikesConstructor(TestCase):
         self.number_of_units = 2
         self.number_of_bins = 3
         self.number_of_events = 4
-        self.bin_width_in_milliseconds = 20.0
+        self.bin_width_in_ms = 20.0
         self.milliseconds_from_event_to_first_bin = -100.0
         self.rng = np.random.default_rng(seed=0)
 
@@ -43,7 +43,7 @@ class TestBinnedAlignedSpikesConstructor(TestCase):
         """Test that the constructor for BinnedAlignedSpikes sets values as expected."""
 
         binned_aligned_spikes = BinnedAlignedSpikes(
-            bin_width_in_milliseconds=self.bin_width_in_milliseconds,
+            bin_width_in_ms=self.bin_width_in_ms,
             milliseconds_from_event_to_first_bin=self.milliseconds_from_event_to_first_bin,
             data=self.data,
             event_timestamps=self.event_timestamps,
@@ -52,7 +52,7 @@ class TestBinnedAlignedSpikesConstructor(TestCase):
         np.testing.assert_array_equal(binned_aligned_spikes.data, self.data)
         np.testing.assert_array_equal(binned_aligned_spikes.event_timestamps, self.event_timestamps)
 
-        self.assertEqual(binned_aligned_spikes.bin_width_in_milliseconds, self.bin_width_in_milliseconds)
+        self.assertEqual(binned_aligned_spikes.bin_width_in_ms, self.bin_width_in_ms)
         self.assertEqual(
             binned_aligned_spikes.milliseconds_from_event_to_first_bin, self.milliseconds_from_event_to_first_bin
         )
@@ -84,7 +84,7 @@ class TestBinnedAlignedSpikesConstructor(TestCase):
         )
 
         binned_aligned_spikes = BinnedAlignedSpikes(
-            bin_width_in_milliseconds=self.bin_width_in_milliseconds,
+            bin_width_in_ms=self.bin_width_in_ms,
             milliseconds_from_event_to_first_bin=self.milliseconds_from_event_to_first_bin,
             data=self.data,
             event_timestamps=self.event_timestamps,
@@ -102,7 +102,7 @@ class TestBinnedAlignedSpikesConstructor(TestCase):
 
         with self.assertRaises(ValueError):
             BinnedAlignedSpikes(
-                bin_width_in_milliseconds=self.bin_width_in_milliseconds,
+                bin_width_in_ms=self.bin_width_in_ms,
                 milliseconds_from_event_to_first_bin=self.milliseconds_from_event_to_first_bin,
                 data=self.data,
                 event_timestamps=shorter_timestamps,
@@ -120,7 +120,7 @@ class TestBinnedAlignedSpikesMultipleConditions(TestCase):
         self.number_of_events = 5
         self.number_of_conditions = 2
 
-        self.bin_width_in_milliseconds = 20.0
+        self.bin_width_in_ms = 20.0
         self.milliseconds_from_event_to_first_bin = -100.0
 
         # Two units in total and 4 bins, and condition with two timestamps
@@ -181,7 +181,7 @@ class TestBinnedAlignedSpikesMultipleConditions(TestCase):
         # Test error if the timestamps are not sorted and/or aligned to conditions
         with self.assertRaises(ValueError):
             BinnedAlignedSpikes(
-                bin_width_in_milliseconds=self.bin_width_in_milliseconds,
+                bin_width_in_ms=self.bin_width_in_ms,
                 milliseconds_from_event_to_first_bin=self.milliseconds_from_event_to_first_bin,
                 data=self.data,
                 event_timestamps=self.event_timestamps,
@@ -195,7 +195,7 @@ class TestBinnedAlignedSpikesMultipleConditions(TestCase):
         )
 
         binnned_align_spikes = BinnedAlignedSpikes(
-            bin_width_in_milliseconds=self.bin_width_in_milliseconds,
+            bin_width_in_ms=self.bin_width_in_ms,
             milliseconds_from_event_to_first_bin=self.milliseconds_from_event_to_first_bin,
             data=data,
             event_timestamps=event_timestamps,
@@ -211,7 +211,7 @@ class TestBinnedAlignedSpikesMultipleConditions(TestCase):
 
         np.testing.assert_array_equal(binnned_align_spikes.condition_labels, self.condition_labels)
 
-        self.assertEqual(binnned_align_spikes.bin_width_in_milliseconds, self.bin_width_in_milliseconds)
+        self.assertEqual(binnned_align_spikes.bin_width_in_ms, self.bin_width_in_ms)
         self.assertEqual(
             binnned_align_spikes.milliseconds_from_event_to_first_bin,
             self.milliseconds_from_event_to_first_bin,
@@ -230,7 +230,7 @@ class TestBinnedAlignedSpikesMultipleConditions(TestCase):
         )
 
         binnned_align_spikes = BinnedAlignedSpikes(
-            bin_width_in_milliseconds=self.bin_width_in_milliseconds,
+            bin_width_in_ms=self.bin_width_in_ms,
             milliseconds_from_event_to_first_bin=self.milliseconds_from_event_to_first_bin,
             data=data,
             event_timestamps=event_timestamps,

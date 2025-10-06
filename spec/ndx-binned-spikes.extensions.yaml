@@ -14,7 +14,7 @@ groups:
     value: Spikes data binned and aligned to the event timestamps of one or multiple
       conditions.
     doc: A description of what the data represents
-  - name: bin_width_in_milliseconds
+  - name: bin_width_in_ms
     dtype: float64
     doc: The length in milliseconds of the bins
   - name: milliseconds_from_event_to_first_bin
@@ -83,15 +83,14 @@ groups:
     dtype: text
     value: Binned spike counts.
     doc: A description of what the data represents
-  - name: bin_width_in_milliseconds
+  - name: bin_width_in_ms
     dtype: float64
     doc: The length in milliseconds of the bins
-  - name: milliseconds_from_event_to_first_bin
+  - name: start_time_in_ms
     dtype: float64
     default_value: 0.0
-    doc: The time in milliseconds from the event to the beginning of the first bin.
-      A negative value indicatesthat the first bin is before the event whereas a positive
-      value indicates that the first bin is after the event.
+    doc: The timestamp of the beginning of the first bin in milliseconds. The default
+      value is 0, which represents the beginning of the session.
     required: false
   datasets:
   - name: data

@@ -44,11 +44,11 @@ data = np.array(
 
 event_timestamps = np.array([0.25, 5.0, 12.25])  # The timestamps to which we align the counts
 milliseconds_from_event_to_first_bin = -50.0  # The first bin is 50 ms before the event
-bin_width_in_milliseconds = 100.0  # Each bin is 100 ms wide
+bin_width_in_ms = 100.0  # Each bin is 100 ms wide
 binned_aligned_spikes = BinnedAlignedSpikes(
     data=data,
     event_timestamps=event_timestamps,
-    bin_width_in_milliseconds=bin_width_in_milliseconds,
+    bin_width_in_ms=bin_width_in_ms,
     milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin
 )
 
@@ -81,9 +81,9 @@ with NWBHDF5IO("binned_aligned_spikes.nwb", "w") as io:
 
 ### Parameters and data structure
 The structure of the bins are characterized with the following parameters:
- 
-* `milliseconds_from_event_to_first_bin`: The time in milliseconds from the event to the beginning of the first bin. A negative value indicates that the first bin is before the event whereas a positive value indicates that the first bin is after the event. 
-* `bin_width_in_milliseconds`: The width of each bin in milliseconds.
+
+* `milliseconds_from_event_to_first_bin`: The time in milliseconds from the event to the beginning of the first bin. A negative value indicates that the first bin is before the event whereas a positive value indicates that the first bin is after the event.
+* `bin_width_in_ms`: The width of each bin in milliseconds.
 
 
 <div style="text-align: center;">
@@ -163,13 +163,13 @@ units_region = DynamicTableRegion(
 
 event_timestamps = np.array([0.25, 5.0, 12.25])
 milliseconds_from_event_to_first_bin = -50.0  # The first bin is 50 ms before the event
-bin_width_in_milliseconds = 100.0
+bin_width_in_ms = 100.0
 name = "BinnedAignedSpikesForMyPurpose"
 description = "Spike counts that is binned and aligned to events."
 binned_aligned_spikes = BinnedAlignedSpikes(
     data=data,
     event_timestamps=event_timestamps,
-    bin_width_in_milliseconds=bin_width_in_milliseconds,
+    bin_width_in_ms=bin_width_in_ms,
     milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
     description=description,
     name=name,
@@ -188,7 +188,7 @@ As with the previous example this can be then added to a processing module in an
 from ndx_binned_spikes import BinnedAlignedSpikes
 
 binned_aligned_spikes = BinnedAlignedSpikes(
-    bin_width_in_milliseconds=bin_width_in_milliseconds,
+    bin_width_in_ms=bin_width_in_ms,
     milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
     data=data,  # Shape (number_of_units, number_of_events, number_of_bins)
     timestamps=timestamps,  # Shape (number_of_events,)
@@ -209,10 +209,10 @@ It's important to note that the timestamps must be in ascending order and must c
 sorted_data, sorted_event_timestamps, sorted_condition_indices = BinnedAlignedSpikes.sort_data_by_event_timestamps(data=data, event_timestamps=event_timestamps, condition_indices=condition_indices)
 
 binned_aligned_spikes = BinnedAlignedSpikes(
-    bin_width_in_milliseconds=bin_width_in_milliseconds,
+    bin_width_in_ms=bin_width_in_ms,
     milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
-    data=sorted_data,   
-    event_timestamps=sorted_event_timestamps,  
+    data=sorted_data,
+    event_timestamps=sorted_event_timestamps,
     condition_indices=sorted_condition_indices,
     condition_labels=condition_labels
 )
@@ -277,7 +277,7 @@ The way that we would build the data for the `BinnedAlignedSpikes` object is as 
 ```python
 from ndx_binned_spikes import BinnedAlignedSpikes
 
-bin_width_in_milliseconds = 100.0
+bin_width_in_ms = 100.0
 milliseconds_from_event_to_first_bin = -50.0
 
 data = np.concatenate([data_for_first_stimuli, data_for_second_stimuli], axis=1)
@@ -288,11 +288,11 @@ condition_labels = ["a", "b"]
 sorted_data, sorted_event_timestamps, sorted_condition_indices = BinnedAlignedSpikes.sort_data_by_event_timestamps(data=data, event_timestamps=event_timestamps, condition_indices=condition_indices)
 
 binned_aligned_spikes = BinnedAlignedSpikes(
-    bin_width_in_milliseconds=bin_width_in_milliseconds,
+    bin_width_in_ms=bin_width_in_ms,
     milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
-    data=sorted_data,   
-    event_timestamps=sorted_event_timestamps,  
-    condition_indices=sorted_condition_indices,  
+    data=sorted_data,
+    event_timestamps=sorted_event_timestamps,
+    condition_indices=sorted_condition_indices,
 )
 ```
 
@@ -305,7 +305,7 @@ np.testing.assert_array_equal(retrieved_data_for_first_stimuli, data_for_first_s
 
 ## BinnedSpikes
 
-The `BinnedSpikes` object is designed to store non-aligned binned spike counts as a 2D array (unit × bin). Unlike `BinnedAlignedSpikes`, this class is simpler and does not align the spike counts to specific events. It's useful for storing total spike counts over time bins.
+The `BinnedSpikes` object is designed to store non-aligned binned spike counts as a 2D array (unit × bin). Unlike `BinnedAlignedSpikes`, this class is simpler and does not align the spike counts to specific events. It's intended for storing spike counts across the entire experimental session, typically with a large number of bins covering the full duration from session start to end.
 
 ### Simple example
 
@@ -323,13 +323,13 @@ data = np.array(
     dtype="uint64",
 )
 
-bin_width_in_milliseconds = 100.0  # Each bin is 100 ms wide
-milliseconds_from_event_to_first_bin = 0.0  # Reference point for the first bin
+bin_width_in_ms = 100.0  # Each bin is 100 ms wide
+start_time_in_ms = 0.0  # The timestamp of the beginning of the first bin (0 = session start)
 
 binned_spikes = BinnedSpikes(
     data=data,
-    bin_width_in_milliseconds=bin_width_in_milliseconds,
-    milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin
+    bin_width_in_ms=bin_width_in_ms,
+    start_time_in_ms=start_time_in_ms
 )
 ```
 
@@ -362,8 +362,8 @@ with NWBHDF5IO("binned_spikes.nwb", "w") as io:
 
 The structure of the bins is characterized with the following parameters:
 
-* `bin_width_in_milliseconds`: The width of each bin in milliseconds.
-* `milliseconds_from_event_to_first_bin`: The time in milliseconds from a reference point to the beginning of the first bin.
+* `bin_width_in_ms`: The width of each bin in milliseconds.
+* `start_time_in_ms`: The timestamp of the beginning of the first bin in milliseconds. The default value is 0, which represents the beginning of the session.
 
 The `data` argument passed to the `BinnedSpikes` stores counts for each unit across all bins. The data is a 2D array where the first dimension indexes the units and the second dimension indexes the bins. The shape of the data is `(number_of_units, number_of_bins)`.
 
@@ -401,8 +401,8 @@ data = np.array(
 
 binned_spikes = BinnedSpikes(
     data=data,
-    bin_width_in_milliseconds=100.0,
-    milliseconds_from_event_to_first_bin=0.0,
+    bin_width_in_ms=100.0,
+    start_time_in_ms=0.0,
     units_region=units_region,
 )
 ```

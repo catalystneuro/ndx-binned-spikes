@@ -29,7 +29,7 @@ class BinnedAlignedSpikes(NWBDataInterface):
     __nwbfields__ = (
         "name",
         "description",
-        "bin_width_in_milliseconds",
+        "bin_width_in_ms",
         "milliseconds_from_event_to_first_bin",
         "data",
         "timestamps",
@@ -55,7 +55,7 @@ class BinnedAlignedSpikes(NWBDataInterface):
             "default": DEFAULT_DESCRIPTION,
         },
         {
-            "name": "bin_width_in_milliseconds",
+            "name": "bin_width_in_ms",
             "type": float,
             "doc": "The length in milliseconds of the bins",
         },
@@ -211,8 +211,8 @@ class BinnedSpikes(NWBDataInterface):
     __nwbfields__ = (
         "name",
         "description",
-        "bin_width_in_milliseconds",
-        "milliseconds_from_event_to_first_bin",
+        "bin_width_in_ms",
+        "start_time_in_ms",
         "data",
         {"name": "units_region", "child": True},
     )
@@ -234,17 +234,16 @@ class BinnedSpikes(NWBDataInterface):
             "default": DEFAULT_DESCRIPTION,
         },
         {
-            "name": "bin_width_in_milliseconds",
+            "name": "bin_width_in_ms",
             "type": float,
             "doc": "The length in milliseconds of the bins",
         },
         {
-            "name": "milliseconds_from_event_to_first_bin",
+            "name": "start_time_in_ms",
             "type": float,
             "doc": (
-                "The time in milliseconds from the event to the beginning of the first bin. A negative value indicates"
-                "that the first bin is before the event whereas a positive value indicates that the first bin is "
-                "after the event."
+                "The timestamp of the beginning of the first bin in milliseconds. The default "
+                "value is 0, which represents the beginning of the session."
             ),
             "default": 0.0,
         },
