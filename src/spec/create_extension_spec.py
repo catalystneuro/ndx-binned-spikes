@@ -96,7 +96,7 @@ def main():
                 value="Spikes data binned and aligned to the event timestamps of one or multiple conditions.",
             ),
             NWBAttributeSpec(
-                name="bin_width_in_milliseconds",
+                name="bin_width_in_ms",
                 doc="The length in milliseconds of the bins",
                 dtype="float64",
             ),
@@ -105,7 +105,7 @@ def main():
                 doc=(
                 "The time in milliseconds from the event to the beginning of the first bin. A negative value indicates"
                 "that the first bin is before the event whereas a positive value indicates that the first bin is "
-                "after the event." 
+                "after the event."
                 ),
                 dtype="float64",
                 default_value=0.0,
@@ -114,7 +114,56 @@ def main():
     )
     
 
-    new_data_types = [binned_aligned_spikes]
+    # Define BinnedSpikes - a 2D array of unit x bin for non-aligned spike counts
+    binned_spikes_data = NWBDatasetSpec(
+        name="data",
+        doc=(
+            "The binned data. It should be an array whose first dimension is the number of units, "
+            "and the second dimension is the number of bins."
+            ),
+        dtype="numeric",  
+        shape=[None, None],
+        dims=["num_units", "number_of_bins"],
+    )
+    
+    binned_spikes = NWBGroupSpec(
+        neurodata_type_def="BinnedSpikes",
+        neurodata_type_inc="NWBDataInterface",
+        default_name="BinnedSpikes",
+        doc="A data interface for non-aligned binned spike counts.",
+        datasets=[binned_spikes_data, units_region],
+        attributes=[
+            NWBAttributeSpec(
+                name="name",
+                doc="The name of this container",
+                dtype="text",
+                value="BinnedSpikes",
+            ),
+            NWBAttributeSpec(
+                name="description",
+                doc="A description of what the data represents",
+                dtype="text",
+                value="Binned spike counts.",
+            ),
+            NWBAttributeSpec(
+                name="bin_width_in_ms",
+                doc="The length in milliseconds of the bins",
+                dtype="float64",
+            ),
+            NWBAttributeSpec(
+                name="start_time_in_ms",
+                doc=(
+                "The timestamp of the beginning of the first bin in milliseconds. The default "
+                "value is 0, which represents the beginning of the session."
+                ),
+                dtype="float64",
+                default_value=0.0,
+                required=False,
+            )
+        ],
+    )
+    
+    new_data_types = [binned_aligned_spikes, binned_spikes]
 
     # export the spec to yaml files in the spec folder
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "spec"))

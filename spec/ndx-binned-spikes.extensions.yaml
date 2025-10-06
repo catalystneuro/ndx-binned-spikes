@@ -14,7 +14,7 @@ groups:
     value: Spikes data binned and aligned to the event timestamps of one or multiple
       conditions.
     doc: A description of what the data represents
-  - name: bin_width_in_milliseconds
+  - name: bin_width_in_ms
     dtype: float64
     doc: The length in milliseconds of the bins
   - name: milliseconds_from_event_to_first_bin
@@ -66,6 +66,43 @@ groups:
       is aligned to multiple conditions. First condition is index 0, second is index
       1, etc.
     quantity: '?'
+  - name: units_region
+    neurodata_type_inc: DynamicTableRegion
+    doc: A reference to the Units table region that contains the units of the data.
+    quantity: '?'
+- neurodata_type_def: BinnedSpikes
+  neurodata_type_inc: NWBDataInterface
+  default_name: BinnedSpikes
+  doc: A data interface for non-aligned binned spike counts.
+  attributes:
+  - name: name
+    dtype: text
+    value: BinnedSpikes
+    doc: The name of this container
+  - name: description
+    dtype: text
+    value: Binned spike counts.
+    doc: A description of what the data represents
+  - name: bin_width_in_ms
+    dtype: float64
+    doc: The length in milliseconds of the bins
+  - name: start_time_in_ms
+    dtype: float64
+    default_value: 0.0
+    doc: The timestamp of the beginning of the first bin in milliseconds. The default
+      value is 0, which represents the beginning of the session.
+    required: false
+  datasets:
+  - name: data
+    dtype: numeric
+    dims:
+    - num_units
+    - number_of_bins
+    shape:
+    - null
+    - null
+    doc: The binned data. It should be an array whose first dimension is the number
+      of units, and the second dimension is the number of bins.
   - name: units_region
     neurodata_type_inc: DynamicTableRegion
     doc: A reference to the Units table region that contains the units of the data.

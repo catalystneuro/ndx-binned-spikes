@@ -44,11 +44,11 @@ data = np.array(
 
 event_timestamps = np.array([0.25, 5.0, 12.25])  # The timestamps to which we align the counts
 milliseconds_from_event_to_first_bin = -50.0  # The first bin is 50 ms before the event
-bin_width_in_milliseconds = 100.0  # Each bin is 100 ms wide
+bin_width_in_ms = 100.0  # Each bin is 100 ms wide
 binned_aligned_spikes = BinnedAlignedSpikes(
     data=data,
     event_timestamps=event_timestamps,
-    bin_width_in_milliseconds=bin_width_in_milliseconds,
+    bin_width_in_ms=bin_width_in_ms,
     milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin
 )
 
@@ -81,9 +81,9 @@ with NWBHDF5IO("binned_aligned_spikes.nwb", "w") as io:
 
 ### Parameters and data structure
 The structure of the bins are characterized with the following parameters:
- 
-* `milliseconds_from_event_to_first_bin`: The time in milliseconds from the event to the beginning of the first bin. A negative value indicates that the first bin is before the event whereas a positive value indicates that the first bin is after the event. 
-* `bin_width_in_milliseconds`: The width of each bin in milliseconds.
+
+* `milliseconds_from_event_to_first_bin`: The time in milliseconds from the event to the beginning of the first bin. A negative value indicates that the first bin is before the event whereas a positive value indicates that the first bin is after the event.
+* `bin_width_in_ms`: The width of each bin in milliseconds.
 
 
 <div style="text-align: center;">
@@ -163,13 +163,13 @@ units_region = DynamicTableRegion(
 
 event_timestamps = np.array([0.25, 5.0, 12.25])
 milliseconds_from_event_to_first_bin = -50.0  # The first bin is 50 ms before the event
-bin_width_in_milliseconds = 100.0
+bin_width_in_ms = 100.0
 name = "BinnedAignedSpikesForMyPurpose"
 description = "Spike counts that is binned and aligned to events."
 binned_aligned_spikes = BinnedAlignedSpikes(
     data=data,
     event_timestamps=event_timestamps,
-    bin_width_in_milliseconds=bin_width_in_milliseconds,
+    bin_width_in_ms=bin_width_in_ms,
     milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
     description=description,
     name=name,
@@ -188,7 +188,7 @@ As with the previous example this can be then added to a processing module in an
 from ndx_binned_spikes import BinnedAlignedSpikes
 
 binned_aligned_spikes = BinnedAlignedSpikes(
-    bin_width_in_milliseconds=bin_width_in_milliseconds,
+    bin_width_in_ms=bin_width_in_ms,
     milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
     data=data,  # Shape (number_of_units, number_of_events, number_of_bins)
     timestamps=timestamps,  # Shape (number_of_events,)
@@ -209,10 +209,10 @@ It's important to note that the timestamps must be in ascending order and must c
 sorted_data, sorted_event_timestamps, sorted_condition_indices = BinnedAlignedSpikes.sort_data_by_event_timestamps(data=data, event_timestamps=event_timestamps, condition_indices=condition_indices)
 
 binned_aligned_spikes = BinnedAlignedSpikes(
-    bin_width_in_milliseconds=bin_width_in_milliseconds,
+    bin_width_in_ms=bin_width_in_ms,
     milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
-    data=sorted_data,   
-    event_timestamps=sorted_event_timestamps,  
+    data=sorted_data,
+    event_timestamps=sorted_event_timestamps,
     condition_indices=sorted_condition_indices,
     condition_labels=condition_labels
 )
@@ -277,7 +277,7 @@ The way that we would build the data for the `BinnedAlignedSpikes` object is as 
 ```python
 from ndx_binned_spikes import BinnedAlignedSpikes
 
-bin_width_in_milliseconds = 100.0
+bin_width_in_ms = 100.0
 milliseconds_from_event_to_first_bin = -50.0
 
 data = np.concatenate([data_for_first_stimuli, data_for_second_stimuli], axis=1)
@@ -288,11 +288,11 @@ condition_labels = ["a", "b"]
 sorted_data, sorted_event_timestamps, sorted_condition_indices = BinnedAlignedSpikes.sort_data_by_event_timestamps(data=data, event_timestamps=event_timestamps, condition_indices=condition_indices)
 
 binned_aligned_spikes = BinnedAlignedSpikes(
-    bin_width_in_milliseconds=bin_width_in_milliseconds,
+    bin_width_in_ms=bin_width_in_ms,
     milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
-    data=sorted_data,   
-    event_timestamps=sorted_event_timestamps,  
-    condition_indices=sorted_condition_indices,  
+    data=sorted_data,
+    event_timestamps=sorted_event_timestamps,
+    condition_indices=sorted_condition_indices,
 )
 ```
 
@@ -301,6 +301,110 @@ Then we can recover the original data by calling the `get_data_for_condition` me
 ```python
 retrieved_data_for_first_stimuli = binned_aligned_spikes.get_data_for_condition(condition_index=0)
 np.testing.assert_array_equal(retrieved_data_for_first_stimuli, data_for_first_stimuli)
+```
+
+## BinnedSpikes
+
+The `BinnedSpikes` object is designed to store non-aligned binned spike counts as a 2D array (unit × bin). Unlike `BinnedAlignedSpikes`, this class is simpler and does not align the spike counts to specific events. It's intended for storing spike counts across the entire experimental session, typically with a large number of bins covering the full duration from session start to end.
+
+### Simple example
+
+The following code illustrates a minimal use of the `BinnedSpikes` class:
+
+```python
+import numpy as np
+from ndx_binned_spikes import BinnedSpikes
+
+data = np.array(
+    [
+        [5, 1, 3, 2, 6, 3, 4, 3, 4, 2],  # Bin counts for unit 0
+        [8, 4, 0, 2, 3, 3, 4, 2, 2, 7],  # Bin counts for unit 1
+    ],
+    dtype="uint64",
+)
+
+bin_width_in_ms = 100.0  # Each bin is 100 ms wide
+start_time_in_ms = 0.0  # The timestamp of the beginning of the first bin (0 = session start)
+
+binned_spikes = BinnedSpikes(
+    data=data,
+    bin_width_in_ms=bin_width_in_ms,
+    start_time_in_ms=start_time_in_ms
+)
+```
+
+The resulting object can be added to a processing module in an NWB file just like the `BinnedAlignedSpikes` object:
+
+```python
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from pynwb import NWBHDF5IO, NWBFile
+
+session_description = "A session with binned spike counts"
+session_start_time = datetime.now(ZoneInfo("UTC"))
+identifier = "binned_spikes_session"
+nwbfile = NWBFile(
+    session_description=session_description,
+    session_start_time=session_start_time,
+    identifier=identifier,
+)
+
+ecephys_processing_module = nwbfile.create_processing_module(
+    name="ecephys", description="Processed electrophysiology data."
+)
+ecephys_processing_module.add(binned_spikes)
+
+with NWBHDF5IO("binned_spikes.nwb", "w") as io:
+    io.write(nwbfile)
+```
+
+### Parameters and data structure
+
+The structure of the bins is characterized with the following parameters:
+
+* `bin_width_in_ms`: The width of each bin in milliseconds.
+* `start_time_in_ms`: The timestamp of the beginning of the first bin in milliseconds. The default value is 0, which represents the beginning of the session.
+
+The `data` argument passed to the `BinnedSpikes` stores counts for each unit across all bins. The data is a 2D array where the first dimension indexes the units and the second dimension indexes the bins. The shape of the data is `(number_of_units, number_of_bins)`.
+
+### Linking to units table
+
+Just like with `BinnedAlignedSpikes`, you can link the `BinnedSpikes` object to a `Units` table to indicate which units the first dimension of the `data` attribute corresponds to:
+
+```python
+from ndx_binned_spikes import BinnedSpikes
+from hdmf.common import DynamicTableRegion
+from pynwb.misc import Units
+
+# Create a Units table
+units_table = Units(name="units")
+units_table.add_column(name="unit_name", description="name of the unit")
+
+# Add some units to the table
+for i in range(5):
+    units_table.add_unit(spike_times=[1.1, 2.2, 3.3], unit_name=f"unit_{i}")
+
+# Create a DynamicTableRegion to link specific units
+region_indices = [1, 3]   
+units_region = DynamicTableRegion(
+    data=region_indices, table=units_table, description="region of units table", name="units_region"
+)
+
+# Create the BinnedSpikes object with the units_region
+data = np.array(
+    [
+        [5, 1, 3, 2, 6],  # Data for unit 1 in the units table
+        [8, 4, 0, 2, 3],  # Data for unit 3 in the units table
+    ],
+    dtype="uint64",
+)
+
+binned_spikes = BinnedSpikes(
+    data=data,
+    bin_width_in_ms=100.0,
+    start_time_in_ms=0.0,
+    units_region=units_region,
+)
 ```
 
 ---

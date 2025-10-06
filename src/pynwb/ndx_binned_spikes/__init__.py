@@ -29,7 +29,7 @@ class BinnedAlignedSpikes(NWBDataInterface):
     __nwbfields__ = (
         "name",
         "description",
-        "bin_width_in_milliseconds",
+        "bin_width_in_ms",
         "milliseconds_from_event_to_first_bin",
         "data",
         "timestamps",
@@ -55,7 +55,7 @@ class BinnedAlignedSpikes(NWBDataInterface):
             "default": DEFAULT_DESCRIPTION,
         },
         {
-            "name": "bin_width_in_milliseconds",
+            "name": "bin_width_in_ms",
             "type": float,
             "doc": "The length in milliseconds of the bins",
         },
@@ -205,6 +205,79 @@ class BinnedAlignedSpikes(NWBDataInterface):
             return np.unique(self.condition_indices).size
         else:
             return 1
+
+@register_class(neurodata_type="BinnedSpikes", namespace="ndx-binned-spikes")  # noqa
+class BinnedSpikes(NWBDataInterface):
+    __nwbfields__ = (
+        "name",
+        "description",
+        "bin_width_in_ms",
+        "start_time_in_ms",
+        "data",
+        {"name": "units_region", "child": True},
+    )
+
+    DEFAULT_NAME = "BinnedSpikes"
+    DEFAULT_DESCRIPTION = "Binned spike counts."
+
+    @docval(
+        {
+            "name": "name",
+            "type": str,
+            "doc": "The name of this container",
+            "default": DEFAULT_NAME,
+        },
+        {
+            "name": "description",
+            "type": str,
+            "doc": "A description of what the data represents",
+            "default": DEFAULT_DESCRIPTION,
+        },
+        {
+            "name": "bin_width_in_ms",
+            "type": float,
+            "doc": "The length in milliseconds of the bins",
+        },
+        {
+            "name": "start_time_in_ms",
+            "type": float,
+            "doc": (
+                "The timestamp of the beginning of the first bin in milliseconds. The default "
+                "value is 0, which represents the beginning of the session."
+            ),
+            "default": 0.0,
+        },
+        {
+            "name": "data",
+            "type": "array_data",
+            "shape": [(None, None)],
+            "doc": (
+                "The binned data. It should be an array whose first dimension is the number of units, "
+                "and the second dimension is the number of bins."
+            ),
+        },
+        {
+            "name": "units_region",
+            "type": DynamicTableRegion,
+            "doc": "A reference to the Units table region that contains the units of the data.",
+            "default": None,
+        },
+    )
+    def __init__(self, **kwargs):
+        name = kwargs.pop("name")
+        super().__init__(name=name)
+
+        for key in kwargs:
+            setattr(self, key, kwargs[key])
+
+    @property
+    def number_of_units(self):
+        return self.data.shape[0]
+
+    @property
+    def number_of_bins(self):
+        return self.data.shape[1]
+
 
 # Remove these functions from the package
 del load_namespaces, get_class

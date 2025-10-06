@@ -1,6 +1,6 @@
 from typing import Optional
 
-from ndx_binned_spikes import BinnedAlignedSpikes
+from ndx_binned_spikes import BinnedAlignedSpikes, BinnedSpikes
 import numpy as np
 from hdmf.common import DynamicTableRegion
 
@@ -10,7 +10,7 @@ def mock_BinnedAlignedSpikes(
     number_of_events: int = 10,
     number_of_bins: int = 3,
     number_of_conditions: int = 5,
-    bin_width_in_milliseconds: float = 20.0,
+    bin_width_in_ms: float = 20.0,
     milliseconds_from_event_to_first_bin: float = 1.0,
     seed: int = 0,
     event_timestamps: Optional[np.ndarray] = None,
@@ -34,7 +34,7 @@ def mock_BinnedAlignedSpikes(
         The number of bins.
     number_of_conditions : int, optional
         The number of different conditions that the data is aligned to. It should be less than `number_of_events`.
-    bin_width_in_milliseconds : float, optional
+    bin_width_in_ms : float, optional
         The width of each bin in milliseconds.
     milliseconds_from_event_to_first_bin : float, optional
         The time in milliseconds from the event start to the first bin.
@@ -126,7 +126,7 @@ def mock_BinnedAlignedSpikes(
         data[nan_mask] = np.nan
 
     binned_aligned_spikes = BinnedAlignedSpikes(
-        bin_width_in_milliseconds=bin_width_in_milliseconds,
+        bin_width_in_ms=bin_width_in_ms,
         milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
         data=data,
         event_timestamps=event_timestamps,
@@ -135,3 +135,72 @@ def mock_BinnedAlignedSpikes(
         units_region=units_region,
     )
     return binned_aligned_spikes
+
+
+def mock_BinnedSpikes(
+    number_of_units: int = 2,
+    number_of_bins: int = 10,
+    bin_width_in_ms: float = 20.0,
+    start_time_in_ms: float = 0.0,
+    seed: int = 0,
+    data: Optional[np.ndarray] = None,
+    units_region: Optional[DynamicTableRegion] = None,
+    add_random_nans: bool = False,
+) -> BinnedSpikes:
+    """
+    Generate a mock BinnedSpikes object with specified parameters or from given data.
+
+    Parameters
+    ----------
+    number_of_units : int, optional
+        The number of different units (channels, neurons, etc.) to simulate.
+    number_of_bins : int, optional
+        The number of bins.
+    bin_width_in_ms : float, optional
+        The width of each bin in milliseconds.
+    start_time_in_ms : float, optional
+        The timestamp of the beginning of the first bin in milliseconds.
+    seed : int, optional
+        Seed for the random number generator to ensure reproducibility.
+    data : np.ndarray, optional
+        A 2D array of shape (number_of_units, number_of_bins) representing
+        the binned spike data. If provided, it overrides the generation of mock data based on other parameters.
+    units_region: DynamicTableRegion, optional
+        A reference to the Units table region that contains the units of the data.
+    add_random_nans: bool, optional
+        If True, random NaN values will be added to the data.
+
+    Returns
+    -------
+    BinnedSpikes
+        A mock BinnedSpikes object populated with the provided or generated data and parameters.
+    """
+    
+    if data is not None:
+        number_of_units, number_of_bins = data.shape
+    else:
+        rng = np.random.default_rng(seed=seed)
+        data = rng.integers(low=0, high=100, size=(number_of_units, number_of_bins), dtype="uint64")
+
+    # Assert data shapes
+    assertion_msg = (
+        "The shape of `data` should be `(number_of_units, number_of_bins)`, "
+        f"The actual shape is {data.shape} \n "
+        f"but {number_of_bins=}, {number_of_units=} was passed"
+    )
+    assert data.shape == (number_of_units, number_of_bins), assertion_msg
+
+    # Add random nans over all the data
+    if add_random_nans:
+        data = data.astype("float32")
+        rng = np.random.default_rng(seed=seed)
+        nan_mask = rng.choice([True, False], size=data.shape, p=[0.1, 0.9])
+        data[nan_mask] = np.nan
+
+    binned_spikes = BinnedSpikes(
+        bin_width_in_ms=bin_width_in_ms,
+        start_time_in_ms=start_time_in_ms,
+        data=data,
+        units_region=units_region,
+    )
+    return binned_spikes
