@@ -1,22 +1,50 @@
 # ndx-binned-spikes Extension for NWB
 
+This extension provides two data interfaces for storing binned spike count data in the NWB (Neurodata Without Borders) format:
+
+## Overview
+
+### BinnedAlignedSpikes
+Stores spike counts aligned to specific events (e.g., stimulus presentations, behavioral events). This is ideal for creating peri-stimulus time histograms (PSTH) or analyzing neural responses to repeated trials. The data is organized as a 3D array (units × events × bins), allowing you to store spike counts for multiple neurons across multiple event occurrences.
+
+**Use cases:**
+- PSTH analysis around stimulus presentations
+- Trial-aligned neural responses
+- Event-triggered spike analysis across multiple conditions
+
+### BinnedSpikes
+Stores spike counts across continuous time bins without event alignment. This is designed for storing spike counts across an entire experimental session, typically with many bins covering the full recording duration from start to end. The data is organized as a 2D array (units × bins).
+
+**Use cases:**
+- Session-wide spike rate analysis
+- Long-term neural activity patterns
+- Continuous binned representations of neural data
+
 ## Installation
-The extension is already available on [PyPI](https://pypi.org/project/ndx-binned-spikes/) and can be installed using pip. The following command installs the latest version of the extension:
-Python:
+
+**Latest Release on PyPI**
+
+This extension is available on [PyPI](https://pypi.org/project/ndx-binned-spikes/). Install the latest release with:
+
 ```bash
 pip install -U ndx-binned-spikes
 ```
 
-If you want to install the development version of the extension you can install it directly from the GitHub repository. The following command installs the development version of the extension:
+**Development Version**
 
-Python:
+To install the latest development version directly from GitHub:
+
 ```bash
 pip install -U git+https://github.com/catalystneuro/ndx-binned-spikes.git
 ```
 
 ## Usage
 
-The `BinnedAlignedSpikes` object is designed to store counts of spikes around a set of events (e.g., stimuli or behavioral events such as licks). The events are characterized by their timestamps and a bin data structure is used to store the spike counts around each of the event timestamps. The `BinnedAlignedSpikes` object keeps a separate count for each of the units (i.e. neurons), in other words, the spikes of the units are counted separately but aligned to the same set of events.
+This section provides detailed examples for both data interfaces.
+
+## BinnedAlignedSpikes
+
+The `BinnedAlignedSpikes` object stores spike counts around specific event timestamps (e.g., stimuli or behavioral events). Each event is characterized by a timestamp, and a bin structure stores the spike counts around each event. Spike counts are kept separate for each unit (neuron) while being aligned to the same set of events.
 
 ### Simple example
 The following code illustrates a minimal use of this extension:
@@ -43,13 +71,13 @@ data = np.array(
 )
 
 event_timestamps = np.array([0.25, 5.0, 12.25])  # The timestamps to which we align the counts
-milliseconds_from_event_to_first_bin = -50.0  # The first bin is 50 ms before the event
+event_to_bin_offset_in_ms = -50.0  # The first bin is 50 ms before the event
 bin_width_in_ms = 100.0  # Each bin is 100 ms wide
 binned_aligned_spikes = BinnedAlignedSpikes(
     data=data,
     event_timestamps=event_timestamps,
     bin_width_in_ms=bin_width_in_ms,
-    milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin
+    event_to_bin_offset_in_ms=event_to_bin_offset_in_ms
 )
 
 ```
@@ -82,7 +110,7 @@ with NWBHDF5IO("binned_aligned_spikes.nwb", "w") as io:
 ### Parameters and data structure
 The structure of the bins are characterized with the following parameters:
 
-* `milliseconds_from_event_to_first_bin`: The time in milliseconds from the event to the beginning of the first bin. A negative value indicates that the first bin is before the event whereas a positive value indicates that the first bin is after the event.
+* `event_to_bin_offset_in_ms`: The time in milliseconds from the event to the beginning of the first bin. A negative value indicates that the first bin is before the event whereas a positive value indicates that the first bin is after the event.
 * `bin_width_in_ms`: The width of each bin in milliseconds.
 
 
@@ -90,7 +118,7 @@ The structure of the bins are characterized with the following parameters:
     <img src="https://raw.githubusercontent.com/catalystneuro/ndx-binned-spikes/main/assets/parameters.svg" alt="Parameter meaning" style="width: 75%; height: auto;">
 </div>
 
-Note that in the diagram above, the `milliseconds_from_event_to_first_bin` is negative.
+Note that in the diagram above, the `event_to_bin_offset_in_ms` is negative.
 
 
 The `data` argument passed to the `BinnedAlignedSpikes` stores counts across all the event timestamps for each of the units. The data is a 3D array where the first dimension indexes the units, the second dimension indexes the event timestamps, and the third dimension indexes the bins where the counts are stored. The shape of the data is  `(number_of_units`, `number_of_events`, `number_of_bins`). 
@@ -162,7 +190,7 @@ units_region = DynamicTableRegion(
 )
 
 event_timestamps = np.array([0.25, 5.0, 12.25])
-milliseconds_from_event_to_first_bin = -50.0  # The first bin is 50 ms before the event
+event_to_bin_offset_in_ms = -50.0  # The first bin is 50 ms before the event
 bin_width_in_ms = 100.0
 name = "BinnedAignedSpikesForMyPurpose"
 description = "Spike counts that is binned and aligned to events."
@@ -170,7 +198,7 @@ binned_aligned_spikes = BinnedAlignedSpikes(
     data=data,
     event_timestamps=event_timestamps,
     bin_width_in_ms=bin_width_in_ms,
-    milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
+    event_to_bin_offset_in_ms=event_to_bin_offset_in_ms,
     description=description,
     name=name,
     units_region=units_region,
@@ -189,7 +217,7 @@ from ndx_binned_spikes import BinnedAlignedSpikes
 
 binned_aligned_spikes = BinnedAlignedSpikes(
     bin_width_in_ms=bin_width_in_ms,
-    milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
+    event_to_bin_offset_in_ms=event_to_bin_offset_in_ms,
     data=data,  # Shape (number_of_units, number_of_events, number_of_bins)
     timestamps=timestamps,  # Shape (number_of_events,)
     condition_indices=condition_indices,  # Shape (number_of_events,)
@@ -210,7 +238,7 @@ sorted_data, sorted_event_timestamps, sorted_condition_indices = BinnedAlignedSp
 
 binned_aligned_spikes = BinnedAlignedSpikes(
     bin_width_in_ms=bin_width_in_ms,
-    milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
+    event_to_bin_offset_in_ms=event_to_bin_offset_in_ms,
     data=sorted_data,
     event_timestamps=sorted_event_timestamps,
     condition_indices=sorted_condition_indices,
@@ -278,7 +306,7 @@ The way that we would build the data for the `BinnedAlignedSpikes` object is as 
 from ndx_binned_spikes import BinnedAlignedSpikes
 
 bin_width_in_ms = 100.0
-milliseconds_from_event_to_first_bin = -50.0
+event_to_bin_offset_in_ms = -50.0
 
 data = np.concatenate([data_for_first_stimuli, data_for_second_stimuli], axis=1)
 event_timestamps = np.concatenate([timestamps_first_stimuli, timestamps_second_stimuli])
@@ -289,7 +317,7 @@ sorted_data, sorted_event_timestamps, sorted_condition_indices = BinnedAlignedSp
 
 binned_aligned_spikes = BinnedAlignedSpikes(
     bin_width_in_ms=bin_width_in_ms,
-    milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
+    event_to_bin_offset_in_ms=event_to_bin_offset_in_ms,
     data=sorted_data,
     event_timestamps=sorted_event_timestamps,
     condition_indices=sorted_condition_indices,

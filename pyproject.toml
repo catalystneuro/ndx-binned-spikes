@@ -4,21 +4,21 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ndx-binned-spikes"
-version = "0.2.1"
+version = "0.3.0"
 authors = [
     { name="Ben Dicther", email="ben.dichter@gmail.com" },
     { name="Heberto Mayorquin", email="h.mayorquin@gmail.com" },
 ]
-description = "to-do"
+description = "NWB extension for storing binned spike data"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = {text = "MIT"}
 classifiers = [
     "Development Status :: 3 - Alpha",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
@@ -31,8 +31,8 @@ keywords = [
     'ndx-extension',
 ]
 dependencies = [
-    "pynwb>=2.8.1",
-    "hdmf>=3.14.2",
+    "pynwb>=3.0.0",
+    "hdmf>=4.0.0",
 ]
 
 [project.urls]

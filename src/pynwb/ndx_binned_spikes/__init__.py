@@ -30,7 +30,7 @@ class BinnedAlignedSpikes(NWBDataInterface):
         "name",
         "description",
         "bin_width_in_ms",
-        "milliseconds_from_event_to_first_bin",
+        "event_to_bin_offset_in_ms",
         "data",
         "timestamps",
         "condition_indices",
@@ -60,7 +60,7 @@ class BinnedAlignedSpikes(NWBDataInterface):
             "doc": "The length in milliseconds of the bins",
         },
         {
-            "name": "milliseconds_from_event_to_first_bin",
+            "name": "event_to_bin_offset_in_ms",
             "type": float,
             "doc": (
                 "The time in milliseconds from the event to the beginning of the first bin. A negative value indicates"

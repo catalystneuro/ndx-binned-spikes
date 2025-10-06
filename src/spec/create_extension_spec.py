@@ -101,11 +101,11 @@ def main():
                 dtype="float64",
             ),
             NWBAttributeSpec(
-                name="milliseconds_from_event_to_first_bin",
+                name="event_to_bin_offset_in_ms",
                 doc=(
-                "The time in milliseconds from the event to the beginning of the first bin. A negative value indicates"
-                "that the first bin is before the event whereas a positive value indicates that the first bin is "
-                "after the event."
+                "The time offset from the event timestamp to the start of the first bin. Negative "
+                "values indicate bins that start before the event; positive values indicate bins "
+                "that start after the event."
                 ),
                 dtype="float64",
                 default_value=0.0,

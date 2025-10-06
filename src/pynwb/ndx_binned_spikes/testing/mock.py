@@ -11,7 +11,7 @@ def mock_BinnedAlignedSpikes(
     number_of_bins: int = 3,
     number_of_conditions: int = 5,
     bin_width_in_ms: float = 20.0,
-    milliseconds_from_event_to_first_bin: float = 1.0,
+    event_to_bin_offset_in_ms: float = 1.0,
     seed: int = 0,
     event_timestamps: Optional[np.ndarray] = None,
     data: Optional[np.ndarray] = None,
@@ -36,7 +36,7 @@ def mock_BinnedAlignedSpikes(
         The number of different conditions that the data is aligned to. It should be less than `number_of_events`.
     bin_width_in_ms : float, optional
         The width of each bin in milliseconds.
-    milliseconds_from_event_to_first_bin : float, optional
+    event_to_bin_offset_in_ms : float, optional
         The time in milliseconds from the event start to the first bin.
     seed : int, optional
         Seed for the random number generator to ensure reproducibility.
@@ -127,7 +127,7 @@ def mock_BinnedAlignedSpikes(
 
     binned_aligned_spikes = BinnedAlignedSpikes(
         bin_width_in_ms=bin_width_in_ms,
-        milliseconds_from_event_to_first_bin=milliseconds_from_event_to_first_bin,
+        event_to_bin_offset_in_ms=event_to_bin_offset_in_ms,
         data=data,
         event_timestamps=event_timestamps,
         condition_indices=condition_indices,

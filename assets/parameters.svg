@@ -118,7 +118,7 @@
          id="tspan2672-9"
          style="font-size:14.1111px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.6;stroke-dasharray:none"
          x="116.35016"
-         y="-81.006721">bin_width_in_milliseconds</tspan></text>
+         y="-81.006721">bin_width_in_ms</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.1111px;font-family:sans-serif;-inkscape-font-specification:sans-serif;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.6;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
@@ -129,7 +129,7 @@
          style="font-size:14.1111px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.6;stroke-dasharray:none"
          x="-140.03542"
          y="93.340279"
-         id="tspan6743">milliseconds_from_event_to_first_bin</tspan></text>
+         id="tspan6743">event_to_bin_offset_in_ms</tspan></text>
     <g
        id="g18862"
        transform="matrix(8,0,0,8,-394.19562,-387.78315)">
