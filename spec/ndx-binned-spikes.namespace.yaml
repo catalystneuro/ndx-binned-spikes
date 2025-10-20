@@ -10,4 +10,4 @@ namespaces:
   schema:
   - namespace: core
   - source: ndx-binned-spikes.extensions.yaml
-  version: 0.3.1
+  version: 0.3.2

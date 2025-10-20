@@ -8,7 +8,7 @@ def main():
     # these arguments were auto-generated from your cookiecutter inputs
     ns_builder = NWBNamespaceBuilder(
         name="""ndx-binned-spikes""",
-        version="""0.3.1""",
+        version="""0.3.2""",
         doc="""to-do""",
         author=[
             "Ben Dicther",
